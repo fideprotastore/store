@@ -25,46 +25,16 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-    /* Custom scrollbar for category bar */
-    .category-scrollbar::-webkit-scrollbar {
+    /* Custom scrollbar for horizontal scroll */
+    .horizontal-scroll::-webkit-scrollbar {
       height: 6px;
     }
-    .category-scrollbar::-webkit-scrollbar-track {
+    .horizontal-scroll::-webkit-scrollbar-track {
       background: transparent;
     }
-    .category-scrollbar::-webkit-scrollbar-thumb {
+    .horizontal-scroll::-webkit-scrollbar-thumb {
       background-color: #a78bfa;
       border-radius: 3px;
-    }
-    /* Banner slider styles */
-    .banner-slider {
-      scroll-snap-type: x mandatory;
-      -webkit-overflow-scrolling: touch;
-      scroll-behavior: smooth;
-    }
-    .banner-slide {
-      scroll-snap-align: start;
-      flex-shrink: 0;
-      width: 100%;
-      height: 300px;
-      position: relative;
-      overflow: hidden;
-      border-radius: 0.75rem; /* rounded-lg */
-      box-shadow: 0 10px 15px -3px rgb(107 33 168 / 0.3), 0 4px 6px -4px rgb(107 33 168 / 0.2);
-    }
-    .banner-slide img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    /* Hide scrollbar for banner slider */
-    .banner-slider::-webkit-scrollbar {
-      display: none;
-    }
-    .banner-slider {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
     }
   </style>
   <script>
@@ -139,35 +109,6 @@
     </div>
   </header>
   <main class="max-w-[1280px] mx-auto px-6 mt-8">
-    <!-- Banner Slider -->
-    <section aria-label="Banners promocionais" class="mb-8">
-      <div
-        class="banner-slider flex overflow-x-auto scrollbar-hide snap-x gap-4"
-        id="banner-slider"
-      >
-        <div class="banner-slide">
-          <img
-            src="https://storage.googleapis.com/a1aa/image/2b9870d4-8a04-47b1-ac41-7d01e23d2a33.jpg"
-            alt="Banner promocional 1 com texto Promoção Especial 1"
-            loading="lazy"
-          />
-        </div>
-        <div class="banner-slide">
-          <img
-            src="https://storage.googleapis.com/a1aa/image/af8adaa3-280d-4315-6da8-cd129844d0aa.jpg"
-            alt="Banner promocional 2 com texto Promoção Especial 2"
-            loading="lazy"
-          />
-        </div>
-        <div class="banner-slide">
-          <img
-            src="https://storage.googleapis.com/a1aa/image/f11e786f-03d9-46a8-82fe-29f94987fd7b.jpg"
-            alt="Banner promocional 3 com texto Promoção Especial 3"
-            loading="lazy"
-          />
-        </div>
-      </div>
-    </section>
     <!-- Categories Bar -->
     <section aria-label="Categorias populares" class="mb-8">
       <div class="flex items-center justify-between mb-4">
@@ -183,23 +124,23 @@
       </div>
       <ul
         id="popular-categories"
-        class="flex space-x-4 overflow-x-auto category-scrollbar pb-2"
+        class="horizontal-scroll flex space-x-6 overflow-x-auto scrollbar-hide pb-2"
         role="list"
       >
         <!-- Popular categories inserted here -->
       </ul>
       <ul
         id="all-categories"
-        class="hidden mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
+        class="hidden mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6"
         role="list"
       >
         <!-- All categories inserted here -->
       </ul>
     </section>
-    <!-- Products Section -->
-    <section aria-label="Produtos" class="mb-12">
+    <!-- Products Bar -->
+    <section aria-label="Produtos populares" class="mb-12">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold text-gray-800 select-none">Produtos</h2>
+        <h2 class="text-lg font-semibold text-gray-800 select-none">Produtos Populares</h2>
         <button
           id="load-more-products"
           class="text-primary text-sm font-semibold hover:underline focus:outline-none"
@@ -209,7 +150,7 @@
       </div>
       <ul
         id="product-list"
-        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
+        class="horizontal-scroll flex space-x-6 overflow-x-auto scrollbar-hide pb-2"
         role="list"
       >
         <!-- Products inserted here -->
@@ -303,32 +244,28 @@
       renderProducts();
     }
 
-    // Render popular categories (top 8)
+    // Render popular categories (photo + name)
     function renderPopularCategories() {
       popularCategoriesList.innerHTML = "";
       const popularCategories = categories.slice(0, 8);
       popularCategories.forEach((cat) => {
         const li = document.createElement("li");
         li.className =
-          "flex flex-col items-center min-w-[80px] cursor-pointer hover:text-primary transition select-none";
+          "flex flex-col items-center min-w-[100px] cursor-pointer hover:text-primary transition select-none";
         li.setAttribute("tabindex", "0");
         li.setAttribute("role", "button");
         li.setAttribute("aria-label", `Filtrar categoria ${cat}`);
 
-        const circle = document.createElement("div");
-        circle.className =
-          "w-14 h-14 rounded-full bg-primary-light flex items-center justify-center mb-2";
-
-        const icon = document.createElement("i");
-        icon.className = "fas fa-gamepad text-primary text-xl";
-
-        circle.appendChild(icon);
+        const img = document.createElement("img");
+        img.src = getCategoryImage(cat);
+        img.alt = cat;
+        img.className = "w-20 h-20 rounded-lg object-cover mb-2 shadow";
 
         const span = document.createElement("span");
         span.className = "text-xs font-semibold text-center truncate w-full";
         span.textContent = cat;
 
-        li.appendChild(circle);
+        li.appendChild(img);
         li.appendChild(span);
 
         li.onclick = () => {
@@ -345,18 +282,27 @@
       });
     }
 
-    // Render all categories grid
+    // Render all categories grid (photo + name)
     function renderAllCategories() {
       allCategoriesList.innerHTML = "";
       categories.forEach((cat) => {
         const li = document.createElement("li");
         li.className =
-          "cursor-pointer rounded-md border border-gray-300 px-3 py-2 text-center text-sm font-medium text-gray-700 hover:bg-primary-light hover:text-primary transition select-none truncate";
+          "cursor-pointer rounded-lg border border-gray-300 px-3 py-2 text-center text-sm font-medium text-gray-700 hover:bg-primary-light hover:text-primary transition select-none truncate flex flex-col items-center";
         li.setAttribute("tabindex", "0");
         li.setAttribute("role", "button");
         li.setAttribute("aria-label", `Filtrar categoria ${cat}`);
 
-        li.textContent = cat;
+        const img = document.createElement("img");
+        img.src = getCategoryImage(cat);
+        img.alt = cat;
+        img.className = "w-24 h-24 rounded-md object-cover mb-1 shadow";
+
+        const span = document.createElement("span");
+        span.textContent = cat;
+
+        li.appendChild(img);
+        li.appendChild(span);
 
         li.onclick = () => {
           renderProducts(cat);
@@ -372,6 +318,29 @@
 
         allCategoriesList.appendChild(li);
       });
+    }
+
+    // Helper: get category image URL (placeholder or real)
+    function getCategoryImage(category) {
+      // Map known categories to images or use placeholder
+      const map = {
+        "Genshin Impact": "https://storage.googleapis.com/a1aa/image/10490fa4-3ec2-4d9f-4ae6-385e51c523dc.jpg",
+        "League of Legends": "https://storage.googleapis.com/a1aa/image/cf38c57a-de58-4f20-c8b2-3f0e925309b7.jpg",
+        "Clash of Clans": "https://storage.googleapis.com/a1aa/image/4d5e577d-16f0-44a5-c1a7-31f85a3932ce.jpg",
+        "Throne of Liberty": "https://placehold.co/400x400/png?text=Throne+of+Liberty",
+        "Fortnite": "https://storage.googleapis.com/a1aa/image/f985ed8f-e4ee-4aae-5757-9a64f099cbeb.jpg",
+        "Valorant": "https://placehold.co/400x400/png?text=Valorant",
+        "Free Fire": "https://placehold.co/400x400/png?text=Free+Fire",
+        "Roblox": "https://placehold.co/400x400/png?text=Roblox",
+        "Minecraft": "https://storage.googleapis.com/a1aa/image/f677ce06-28a0-482b-4b4d-945a5422fe09.jpg",
+        "Among Us": "https://placehold.co/400x400/png?text=Among+Us",
+        "Call of Duty": "https://placehold.co/400x400/png?text=Call+of+Duty",
+        "Apex Legends": "https://placehold.co/400x400/png?text=Apex+Legends",
+        "PUBG": "https://placehold.co/400x400/png?text=PUBG",
+        "FIFA": "https://placehold.co/400x400/png?text=FIFA",
+        "CS:GO": "https://placehold.co/400x400/png?text=CS:GO"
+      };
+      return map[category] || `https://placehold.co/400x400/png?text=${encodeURIComponent(category)}`;
     }
 
     // Toggle all categories visibility
@@ -392,7 +361,7 @@
       toggleCategories(isHidden);
     });
 
-    // Render products with optional category filter
+    // Render products bar (photo, name, price)
     function renderProducts(filterCategory = null) {
       productList.innerHTML = "";
       let filteredProducts = products;
@@ -411,44 +380,28 @@
       toRender.forEach((product) => {
         const li = document.createElement("li");
         li.className =
-          "bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm flex flex-col";
+          "flex flex-col items-center min-w-[140px] cursor-pointer bg-white rounded-lg shadow hover:shadow-lg transition select-none";
 
         const img = document.createElement("img");
         img.src = product.image;
         img.alt = product.name;
-        img.className = "w-full h-40 object-cover";
-
-        const div = document.createElement("div");
-        div.className = "p-4 flex flex-col flex-grow";
+        img.className = "w-32 h-32 object-cover rounded-t-lg";
 
         const name = document.createElement("h3");
-        name.className = "text-sm font-semibold text-gray-900 truncate";
+        name.className = "text-sm font-semibold text-gray-900 mt-2 px-2 text-center truncate w-full";
         name.textContent = product.name;
 
         const price = document.createElement("p");
-        price.className = "text-primary font-bold mt-1";
+        price.className = "text-primary font-bold mt-1 mb-2";
         price.textContent = `R$ ${product.price.toFixed(2)}`;
 
-        const stock = document.createElement("p");
-        stock.className = "text-xs text-gray-500 mt-1";
-        stock.textContent = `Estoque: ${product.stock}`;
+        li.appendChild(img);
+        li.appendChild(name);
+        li.appendChild(price);
 
-        const btn = document.createElement("button");
-        btn.className =
-          "mt-auto bg-primary text-white py-2 rounded hover:bg-primary-dark transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed";
-        btn.textContent = product.stock > 0 ? "Adicionar ao carrinho" : "Indisponível";
-        btn.disabled = product.stock <= 0;
-        btn.onclick = () => {
+        li.onclick = () => {
           addToCart(product);
         };
-
-        div.appendChild(name);
-        div.appendChild(price);
-        div.appendChild(stock);
-        div.appendChild(btn);
-
-        li.appendChild(img);
-        li.appendChild(div);
 
         productList.appendChild(li);
       });
