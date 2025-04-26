@@ -82,6 +82,11 @@
       },
     };
   </script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
 </head>
 <body class="text-gray-900">
   <header class="bg-white shadow-sm sticky top-0 z-50">
@@ -107,6 +112,7 @@
           placeholder="Buscar produtos ou categorias"
           aria-label="Search input"
           class="bg-transparent text-sm text-gray-600 placeholder-gray-400 focus:outline-none ml-3 w-full"
+          id="search-input"
         />
       </form>
       <nav class="flex items-center space-x-6 text-gray-600">
@@ -236,29 +242,20 @@
     </button>
   </dialog>
   <script>
-    // Data (categories and products) loaded from localStorage or fallback
-    let categories = JSON.parse(localStorage.getItem("fideprota_categories")) || [
-      "Genshin Impact",
-      "League of Legends",
-      "Clash of Clans",
-      "Throne of Liberty",
-      "Fortnite",
-      "Valorant",
-      "Free Fire",
-      "Roblox",
-      "Minecraft",
-      "Among Us",
-      "Call of Duty",
-      "Apex Legends",
-      "PUBG",
-      "FIFA",
-      "CS:GO",
-    ];
-
-    let products = JSON.parse(localStorage.getItem("fideprota_products")) || [];
-
-    // Popular categories (top 8)
-    const popularCategories = categories.slice(0, 8);
+    // Firebase config and initialization
+    const firebaseConfig = {
+      apiKey: "AIzaSyB9P_b9q7JX-WUp1hm2IE6tc9ZwL1JrJRw",
+      authDomain: "fideprotastore.firebaseapp.com",
+      projectId: "fideprotastore",
+      storageBucket: "fideprotastore.appspot.com",
+      messagingSenderId: "528905688496",
+      appId: "1:528905688496:web:69ba0c819d531d08263275",
+      measurementId: "G-XFGP4M7KVN"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
 
     // Elements
     const popularCategoriesList = document.getElementById("popular-categories");
@@ -280,9 +277,40 @@
     // Products pagination
     let productsToShow = 10;
 
-    // Render popular categories
+    // Data holders
+    let categories = [];
+    let products = [];
+
+    // Fetch categories from Firestore
+    async function fetchCategories() {
+      const snapshot = await db.collection("categories").orderBy("name").get();
+      categories = snapshot.docs.map(doc => doc.data().name);
+      renderPopularCategories();
+      renderAllCategories();
+    }
+
+    // Fetch products from Firestore
+    async function fetchProducts() {
+      const snapshot = await db.collection("products").orderBy("name").get();
+      products = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          name: data.name,
+          image: data.image,
+          category: data.category,
+          price: data.price,
+          stock: data.stock,
+          clicks: data.clicks || 0
+        };
+      });
+      renderProducts();
+    }
+
+    // Render popular categories (top 8)
     function renderPopularCategories() {
       popularCategoriesList.innerHTML = "";
+      const popularCategories = categories.slice(0, 8);
       popularCategories.forEach((cat) => {
         const li = document.createElement("li");
         li.className =
@@ -593,11 +621,45 @@
       }
     });
 
-    // Initial render
-    renderPopularCategories();
-    renderAllCategories();
-    renderProducts();
-    updateCartCount();
+    // Initial render after fetching data from Firestore
+    async function init() {
+      try {
+        // Fetch categories
+        const catSnapshot = await db.collection("categories").orderBy("name").get();
+        categories = catSnapshot.docs.map(doc => doc.data().name);
+
+        // Fetch products
+        const prodSnapshot = await db.collection("products").orderBy("name").get();
+        products = prodSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            name: data.name,
+            image: data.image,
+            category: data.category,
+            price: data.price,
+            stock: data.stock,
+            clicks: data.clicks || 0
+          };
+        });
+
+        renderPopularCategories();
+        renderAllCategories();
+        renderProducts();
+        updateCartCount();
+      } catch (error) {
+        console.error("Erro ao carregar dados do Firebase:", error);
+        // Fallback to empty arrays or localStorage if needed
+        categories = [];
+        products = [];
+        renderPopularCategories();
+        renderAllCategories();
+        renderProducts();
+        updateCartCount();
+      }
+    }
+
+    init();
   </script>
 </body>
 </html>
