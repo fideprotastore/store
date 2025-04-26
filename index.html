@@ -84,9 +84,7 @@
   </script>
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
 </head>
 <body class="text-gray-900">
   <header class="bg-white shadow-sm sticky top-0 z-50">
@@ -253,9 +251,7 @@
       measurementId: "G-XFGP4M7KVN"
     };
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
     const db = firebase.firestore();
-    const storage = firebase.storage();
 
     // Elements
     const popularCategoriesList = document.getElementById("popular-categories");
@@ -621,42 +617,39 @@
       }
     });
 
-    // Initial render after fetching data from Firestore
+    // Initial load of data and render
     async function init() {
       try {
-        // Fetch categories
-        const catSnapshot = await db.collection("categories").orderBy("name").get();
-        categories = catSnapshot.docs.map(doc => doc.data().name);
-
-        // Fetch products
-        const prodSnapshot = await db.collection("products").orderBy("name").get();
-        products = prodSnapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            name: data.name,
-            image: data.image,
-            category: data.category,
-            price: data.price,
-            stock: data.stock,
-            clicks: data.clicks || 0
-          };
-        });
-
-        renderPopularCategories();
-        renderAllCategories();
-        renderProducts();
+        await fetchCategories();
+        await fetchProducts();
         updateCartCount();
       } catch (error) {
-        console.error("Erro ao carregar dados do Firebase:", error);
-        // Fallback to empty arrays or localStorage if needed
-        categories = [];
-        products = [];
-        renderPopularCategories();
-        renderAllCategories();
-        renderProducts();
-        updateCartCount();
+        console.error("Erro ao carregar dados:", error);
       }
+    }
+
+    async function fetchCategories() {
+      const snapshot = await db.collection("categories").orderBy("name").get();
+      categories = snapshot.docs.map(doc => doc.data().name);
+      renderPopularCategories();
+      renderAllCategories();
+    }
+
+    async function fetchProducts() {
+      const snapshot = await db.collection("products").orderBy("name").get();
+      products = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          name: data.name,
+          image: data.image,
+          category: data.category,
+          price: data.price,
+          stock: data.stock,
+          clicks: data.clicks || 0
+        };
+      });
+      renderProducts();
     }
 
     init();
