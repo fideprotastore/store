@@ -236,7 +236,7 @@
     </button>
   </dialog>
   <script>
-    // Data (categories and products)
+    // Data (categories and products) loaded from localStorage or fallback
     let categories = JSON.parse(localStorage.getItem("fideprota_categories")) || [
       "Genshin Impact",
       "League of Legends",
@@ -255,107 +255,7 @@
       "CS:GO",
     ];
 
-    let products = JSON.parse(localStorage.getItem("fideprota_products")) || [
-      {
-        name: "Genshin Impact Account",
-        image:
-          "https://storage.googleapis.com/a1aa/image/10490fa4-3ec2-4d9f-4ae6-385e51c523dc.jpg",
-        category: "Genshin Impact",
-        price: 50.0,
-        stock: 10,
-        clicks: 120,
-      },
-      {
-        name: "League of Legends Skin",
-        image:
-          "https://storage.googleapis.com/a1aa/image/cf38c57a-de58-4f20-c8b2-3f0e925309b7.jpg",
-        category: "League of Legends",
-        price: 30.0,
-        stock: 5,
-        clicks: 80,
-      },
-      {
-        name: "Clash of Clans Gems",
-        image:
-          "https://storage.googleapis.com/a1aa/image/4d5e577d-16f0-44a5-c1a7-31f85a3932ce.jpg",
-        category: "Clash of Clans",
-        price: 20.0,
-        stock: 15,
-        clicks: 60,
-      },
-      {
-        name: "Fortnite V-Bucks",
-        image:
-          "https://storage.googleapis.com/a1aa/image/f985ed8f-e4ee-4aae-5757-9a64f099cbeb.jpg",
-        category: "Fortnite",
-        price: 40.0,
-        stock: 8,
-        clicks: 90,
-      },
-      {
-        name: "Minecraft Account",
-        image:
-          "https://storage.googleapis.com/a1aa/image/f677ce06-28a0-482b-4b4d-945a5422fe09.jpg",
-        category: "Minecraft",
-        price: 25.0,
-        stock: 12,
-        clicks: 50,
-      },
-      {
-        name: "Among Us Account",
-        image:
-          "https://placehold.co/600x400/png?text=Among+Us+Account",
-        category: "Among Us",
-        price: 15.0,
-        stock: 20,
-        clicks: 30,
-      },
-      {
-        name: "Call of Duty Points",
-        image:
-          "https://placehold.co/600x400/png?text=Call+of+Duty+Points",
-        category: "Call of Duty",
-        price: 35.0,
-        stock: 7,
-        clicks: 45,
-      },
-      {
-        name: "Apex Legends Skin",
-        image:
-          "https://placehold.co/600x400/png?text=Apex+Legends+Skin",
-        category: "Apex Legends",
-        price: 28.0,
-        stock: 9,
-        clicks: 25,
-      },
-      {
-        name: "PUBG UC",
-        image:
-          "https://placehold.co/600x400/png?text=PUBG+UC",
-        category: "PUBG",
-        price: 22.0,
-        stock: 14,
-        clicks: 40,
-      },
-      {
-        name: "FIFA Coins",
-        image:
-          "https://placehold.co/600x400/png?text=FIFA+Coins",
-        category: "FIFA",
-        price: 18.0,
-        stock: 11,
-        clicks: 35,
-      },
-      {
-        name: "CS:GO Skins",
-        image:
-          "https://placehold.co/600x400/png?text=CS:GO+Skins",
-        category: "CS:GO",
-        price: 45.0,
-        stock: 6,
-        clicks: 55,
-      },
-    ];
+    let products = JSON.parse(localStorage.getItem("fideprota_products")) || [];
 
     // Popular categories (top 8)
     const popularCategories = categories.slice(0, 8);
