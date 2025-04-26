@@ -15,6 +15,7 @@
   <style>
     body {
       font-family: "Inter", sans-serif;
+      background-color: #f9fafb;
     }
     /* Scrollbar hide for overflow-x */
     .scrollbar-hide::-webkit-scrollbar {
@@ -24,13 +25,11 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-    /* Dialog backdrop */
     dialog::backdrop {
       background: rgba(0, 0, 0, 0.4);
     }
   </style>
   <script>
-    // Tailwind config for purple as primary
     tailwind.config = {
       theme: {
         extend: {
@@ -45,11 +44,16 @@
       },
     };
   </script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
 </head>
-<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col">
   <!-- Login Screen -->
   <div id="login-screen" class="fixed inset-0 bg-white flex flex-col justify-center items-center p-6 z-50">
-    <h1 class="text-2xl font-bold mb-6 text-primary">FIDEPROTA STORE Admin Login</h1>
+    <h1 class="text-2xl font-bold mb-6 text-primary">Admin Login</h1>
     <form id="login-form" class="w-full max-w-xs bg-white p-6 rounded-lg shadow-md">
       <label for="admin-password" class="block text-sm font-semibold mb-2 text-primary">Senha de Admin</label>
       <input
@@ -72,7 +76,7 @@
   <!-- Admin Panel -->
   <div id="admin-panel" class="hidden flex-grow max-w-[1280px] mx-auto p-6 flex flex-col space-y-6">
     <header class="flex justify-between items-center border-b border-gray-300 pb-4">
-      <h1 class="text-3xl font-bold text-primary">FIDEPROTA STORE Admin</h1>
+      <h1 class="text-3xl font-bold text-primary">Painel Admin FIDEPROTA STORE</h1>
       <button
         id="logout-btn"
         class="text-sm text-red-600 border border-red-600 px-3 py-1 rounded hover:bg-red-600 hover:text-white transition"
@@ -82,25 +86,6 @@
       </button>
     </header>
 
-    <!-- Metrics Section -->
-    <section aria-label="Métricas do Site" class="bg-white rounded-lg shadow p-6">
-      <h2 class="text-xl font-semibold mb-4 text-primary">Métricas do Site</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-        <div class="bg-primary-light rounded-lg p-4">
-          <h3 class="text-lg font-semibold text-primary-dark">Últimos 7 dias</h3>
-          <p id="metric-7d" class="text-3xl font-bold text-primary-dark mt-2">0</p>
-        </div>
-        <div class="bg-primary-light rounded-lg p-4">
-          <h3 class="text-lg font-semibold text-primary-dark">Últimos 30 dias</h3>
-          <p id="metric-30d" class="text-3xl font-bold text-primary-dark mt-2">0</p>
-        </div>
-        <div class="bg-primary-light rounded-lg p-4">
-          <h3 class="text-lg font-semibold text-primary-dark">Total de Cliques</h3>
-          <p id="metric-total" class="text-3xl font-bold text-primary-dark mt-2">0</p>
-        </div>
-      </div>
-    </section>
-
     <section aria-label="Gerenciar Categorias" class="bg-white rounded-lg shadow p-6">
       <h2 class="text-xl font-semibold mb-4 text-primary">Categorias</h2>
       <form id="add-category-form" class="flex space-x-3 mb-6">
@@ -108,7 +93,7 @@
           type="text"
           id="new-category-name"
           placeholder="Nova categoria"
-          class="flex-grow border border-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+          class="flex-grow border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
           required
         />
         <button
@@ -130,19 +115,19 @@
           type="text"
           id="product-name"
           placeholder="Nome do produto"
-          class="border border-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+          class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
           required
         />
         <input
           type="url"
           id="product-image"
           placeholder="URL da imagem"
-          class="border border-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+          class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
           required
         />
         <select
           id="product-category"
-          class="border border-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+          class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
           required
         >
           <option value="" disabled selected>Selecione a categoria</option>
@@ -153,7 +138,7 @@
           placeholder="Preço (R$)"
           min="0"
           step="0.01"
-          class="border border-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+          class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
           required
         />
         <input
@@ -162,7 +147,7 @@
           placeholder="Estoque"
           min="0"
           step="1"
-          class="border border-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+          class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
           required
         />
         <button
@@ -181,7 +166,6 @@
               <th class="border border-gray-300 px-3 py-2">Categoria</th>
               <th class="border border-gray-300 px-3 py-2">Preço (R$)</th>
               <th class="border border-gray-300 px-3 py-2">Estoque</th>
-              <th class="border border-gray-300 px-3 py-2">Cliques</th>
               <th class="border border-gray-300 px-3 py-2 w-24">Ações</th>
             </tr>
           </thead>
@@ -193,129 +177,37 @@
     </section>
   </div>
 
-  <!-- Dialog for editing category -->
-  <dialog id="edit-category-dialog" class="rounded-lg p-6 w-full max-w-md">
-    <form method="dialog" class="flex flex-col space-y-4">
-      <h3 class="text-lg font-semibold text-primary">Editar Categoria</h3>
-      <input
-        type="text"
-        id="edit-category-input"
-        class="border border-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-        required
-      />
-      <div class="flex justify-end space-x-2">
-        <button
-          type="button"
-          id="cancel-edit-category"
-          class="px-4 py-2 rounded border border-gray-300 hover:bg-gray-100 transition"
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          class="px-4 py-2 rounded bg-primary text-white hover:bg-primary-dark transition"
-        >
-          Salvar
-        </button>
-      </div>
-    </form>
-  </dialog>
-
-  <!-- Dialog for editing product -->
-  <dialog id="edit-product-dialog" class="rounded-lg p-6 w-full max-w-lg">
-    <form method="dialog" class="flex flex-col space-y-4" id="edit-product-form">
-      <h3 class="text-lg font-semibold text-primary">Editar Produto</h3>
-      <label class="flex flex-col text-sm font-semibold">
-        Nome
-        <input
-          type="text"
-          id="edit-product-name"
-          class="border border-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-          required
-        />
-      </label>
-      <label class="flex flex-col text-sm font-semibold">
-        Imagem
-        <input
-          type="url"
-          id="edit-product-image-url"
-          placeholder="URL da imagem"
-          class="border border-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary mb-2"
-        />
-        <input
-          type="file"
-          id="edit-product-image-file"
-          accept="image/*"
-          class="border border-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-      </label>
-      <label class="flex flex-col text-sm font-semibold">
-        Categoria
-        <select
-          id="edit-product-category"
-          class="border border-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-          required
-        >
-          <option value="" disabled>Selecione a categoria</option>
-        </select>
-      </label>
-      <label class="flex flex-col text-sm font-semibold">
-        Preço (R$)
-        <input
-          type="number"
-          id="edit-product-price"
-          min="0"
-          step="0.01"
-          class="border border-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-          required
-        />
-      </label>
-      <label class="flex flex-col text-sm font-semibold">
-        Estoque
-        <input
-          type="number"
-          id="edit-product-stock"
-          min="0"
-          step="1"
-          class="border border-primary rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-          required
-        />
-      </label>
-      <div class="flex justify-end space-x-2">
-        <button
-          type="button"
-          id="cancel-edit-product"
-          class="px-4 py-2 rounded border border-gray-300 hover:bg-gray-100 transition"
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          class="px-4 py-2 rounded bg-primary text-white hover:bg-primary-dark transition"
-        >
-          Salvar
-        </button>
-      </div>
-    </form>
-  </dialog>
-
   <script>
-    // Admin password
+    // Firebase config and initialization
+    const firebaseConfig = {
+      apiKey: "AIzaSyB9P_b9q7JX-WUp1hm2IE6tc9ZwL1JrJRw",
+      authDomain: "fideprotastore.firebaseapp.com",
+      projectId: "fideprotastore",
+      storageBucket: "fideprotastore.appspot.com",
+      messagingSenderId: "528905688496",
+      appId: "1:528905688496:web:69ba0c819d531d08263275",
+      measurementId: "G-XFGP4M7KVN"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    // Admin password (for demo only, use Firebase Auth in production)
     const ADMIN_PASSWORD = "2990298739@";
 
+    // Elements
     const loginScreen = document.getElementById("login-screen");
     const adminPanel = document.getElementById("admin-panel");
     const loginForm = document.getElementById("login-form");
     const loginError = document.getElementById("login-error");
     const logoutBtn = document.getElementById("logout-btn");
 
-    // Elements for categories
     const addCategoryForm = document.getElementById("add-category-form");
     const newCategoryNameInput = document.getElementById("new-category-name");
     const categoriesList = document.getElementById("categories-list");
     const productCategorySelect = document.getElementById("product-category");
 
-    // Elements for products
     const addProductForm = document.getElementById("add-product-form");
     const productNameInput = document.getElementById("product-name");
     const productImageInput = document.getElementById("product-image");
@@ -323,110 +215,77 @@
     const productStockInput = document.getElementById("product-stock");
     const productsList = document.getElementById("products-list");
 
-    // Dialogs and inputs for editing
-    const editCategoryDialog = document.getElementById("edit-category-dialog");
-    const editCategoryInput = document.getElementById("edit-category-input");
-    const cancelEditCategoryBtn = document.getElementById("cancel-edit-category");
+    let categories = [];
+    let products = [];
 
-    const editProductDialog = document.getElementById("edit-product-dialog");
-    const editProductForm = document.getElementById("edit-product-form");
-    const editProductName = document.getElementById("edit-product-name");
-    const editProductImageUrl = document.getElementById("edit-product-image-url");
-    const editProductImageFile = document.getElementById("edit-product-image-file");
-    const editProductCategory = document.getElementById("edit-product-category");
-    const editProductPrice = document.getElementById("edit-product-price");
-    const editProductStock = document.getElementById("edit-product-stock");
-    const cancelEditProductBtn = document.getElementById("cancel-edit-product");
-
-    // Data storage (simulate DB with localStorage)
-    let categories = JSON.parse(localStorage.getItem("fideprota_categories")) || [
-      "Genshin Impact",
-      "League of Legends",
-      "Clash of Clans",
-      "Throne of Liberty",
-      "Fortnite",
-      "Valorant",
-      "Free Fire",
-      "Roblox",
-      "Minecraft",
-    ];
-    // products now have stock, price, clicks, and click history for metrics
-    let products = JSON.parse(localStorage.getItem("fideprota_products")) || [];
-
-    // Metrics data: clicks per day (last 30 days)
-    // Stored as { "YYYY-MM-DD": totalClicks }
-    let clickMetrics = JSON.parse(localStorage.getItem("fideprota_click_metrics")) || {};
-
-    // Track editing indexes
-    let editingCategoryIndex = null;
-    let editingProductIndex = null;
-
-    // Check if admin is logged in
+    // Check login state
     function checkLogin() {
       const loggedIn = sessionStorage.getItem("fideprota_admin_logged_in");
       if (loggedIn === "true") {
         loginScreen.classList.add("hidden");
         adminPanel.classList.remove("hidden");
-        renderCategories();
-        renderProducts();
-        updateMetrics();
+        loadData();
       } else {
         loginScreen.classList.remove("hidden");
         adminPanel.classList.add("hidden");
       }
     }
 
-    // Render categories list and update category select options
+    // Load categories and products from Firestore
+    async function loadData() {
+      try {
+        const catSnapshot = await db.collection("categories").orderBy("name").get();
+        categories = catSnapshot.docs.map(doc => doc.data().name);
+        renderCategories();
+        populateCategorySelect();
+
+        const prodSnapshot = await db.collection("products").orderBy("name").get();
+        products = prodSnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            name: data.name,
+            image: data.image,
+            category: data.category,
+            price: data.price,
+            stock: data.stock,
+          };
+        });
+        renderProducts();
+      } catch (error) {
+        console.error("Erro ao carregar dados do Firebase:", error);
+      }
+    }
+
+    // Render categories list
     function renderCategories() {
       categoriesList.innerHTML = "";
-      productCategorySelect.innerHTML =
-        '<option value="" disabled selected>Selecione a categoria</option>';
-      editProductCategory.innerHTML =
-        '<option value="" disabled>Selecione a categoria</option>';
-
       categories.forEach((cat, index) => {
-        // List item with edit and delete
         const li = document.createElement("li");
-        li.className =
-          "flex justify-between items-center bg-gray-50 rounded px-3 py-1";
+        li.className = "flex justify-between items-center bg-gray-50 rounded px-3 py-1";
 
         const span = document.createElement("span");
         span.textContent = cat;
         span.className = "truncate";
 
-        // Edit button
         const editBtn = document.createElement("button");
-        editBtn.className =
-          "text-primary hover:text-primary-dark text-xs mr-2";
+        editBtn.className = "text-primary hover:text-primary-dark text-xs mr-2";
         editBtn.textContent = "Editar";
         editBtn.type = "button";
         editBtn.onclick = () => {
-          editingCategoryIndex = index;
-          editCategoryInput.value = cat;
-          editCategoryDialog.showModal();
-          editCategoryInput.focus();
+          const newName = prompt("Editar nome da categoria:", cat);
+          if (newName && newName.trim() !== "") {
+            updateCategory(categories[index], newName.trim());
+          }
         };
 
-        // Delete button
         const delBtn = document.createElement("button");
         delBtn.className = "text-red-600 hover:text-red-800 text-xs";
         delBtn.textContent = "Excluir";
         delBtn.type = "button";
         delBtn.onclick = () => {
-          if (
-            confirm(
-              `Tem certeza que deseja excluir a categoria "${cat}"? Isso removerá a categoria dos produtos associados.`
-            )
-          ) {
-            categories.splice(index, 1);
-            // Remove category from products
-            products = products.map((p) =>
-              p.category === cat ? { ...p, category: "" } : p
-            );
-            saveCategories();
-            saveProducts();
-            renderCategories();
-            renderProducts();
+          if (confirm(`Tem certeza que deseja excluir a categoria "${cat}"?`)) {
+            deleteCategory(categories[index]);
           }
         };
 
@@ -434,101 +293,68 @@
         li.appendChild(editBtn);
         li.appendChild(delBtn);
         categoriesList.appendChild(li);
+      });
+    }
 
-        // Add option to selects
-        const option1 = document.createElement("option");
-        option1.value = cat;
-        option1.textContent = cat;
-        productCategorySelect.appendChild(option1);
-
-        const option2 = document.createElement("option");
-        option2.value = cat;
-        option2.textContent = cat;
-        editProductCategory.appendChild(option2);
+    // Populate category select in product form
+    function populateCategorySelect() {
+      productCategorySelect.innerHTML = '<option value="" disabled selected>Selecione a categoria</option>';
+      categories.forEach(cat => {
+        const option = document.createElement("option");
+        option.value = cat;
+        option.textContent = cat;
+        productCategorySelect.appendChild(option);
       });
     }
 
     // Render products list
     function renderProducts() {
       productsList.innerHTML = "";
-      products.forEach((product, index) => {
+      products.forEach(product => {
         const tr = document.createElement("tr");
 
-        // Image cell
         const tdImg = document.createElement("td");
         tdImg.className = "border border-gray-300 px-3 py-2";
         const img = document.createElement("img");
         img.src = product.image;
         img.alt = product.name;
-        img.className = "w-16 h-16 object-cover rounded cursor-pointer";
-        // Count click on image
-        img.onclick = () => {
-          incrementProductClick(index);
-        };
+        img.className = "w-16 h-16 object-cover rounded";
         tdImg.appendChild(img);
 
-        // Name cell
         const tdName = document.createElement("td");
         tdName.className = "border border-gray-300 px-3 py-2";
         tdName.textContent = product.name;
 
-        // Category cell
         const tdCat = document.createElement("td");
         tdCat.className = "border border-gray-300 px-3 py-2";
-        tdCat.textContent = product.category || "-";
+        tdCat.textContent = product.category;
 
-        // Price cell
         const tdPrice = document.createElement("td");
         tdPrice.className = "border border-gray-300 px-3 py-2";
-        tdPrice.textContent = product.price !== undefined ? product.price.toFixed(2) : "-";
+        tdPrice.textContent = product.price.toFixed(2);
 
-        // Stock cell
         const tdStock = document.createElement("td");
         tdStock.className = "border border-gray-300 px-3 py-2";
-        tdStock.textContent = product.stock !== undefined ? product.stock : "-";
+        tdStock.textContent = product.stock;
 
-        // Clicks cell
-        const tdClicks = document.createElement("td");
-        tdClicks.className = "border border-gray-300 px-3 py-2 text-center font-mono";
-        tdClicks.textContent = product.clicks || 0;
-
-        // Actions cell
         const tdActions = document.createElement("td");
         tdActions.className = "border border-gray-300 px-3 py-2 space-x-2";
 
-        // Edit button
         const editBtn = document.createElement("button");
-        editBtn.className =
-          "text-primary hover:text-primary-dark text-xs font-semibold";
+        editBtn.className = "text-primary hover:text-primary-dark text-xs font-semibold";
         editBtn.textContent = "Editar";
         editBtn.type = "button";
         editBtn.onclick = () => {
-          editingProductIndex = index;
-          editProductName.value = product.name;
-          editProductImageUrl.value = product.image;
-          editProductImageFile.value = "";
-          editProductCategory.value = product.category || "";
-          editProductPrice.value = product.price !== undefined ? product.price : "";
-          editProductStock.value = product.stock !== undefined ? product.stock : 0;
-          editProductDialog.showModal();
-          editProductName.focus();
+          editProductDialog(product);
         };
 
-        // Delete button
         const delBtn = document.createElement("button");
         delBtn.className = "text-red-600 hover:text-red-800 text-xs font-semibold";
         delBtn.textContent = "Excluir";
         delBtn.type = "button";
         delBtn.onclick = () => {
-          if (
-            confirm(
-              `Tem certeza que deseja excluir o produto "${product.name}"?`
-            )
-          ) {
-            products.splice(index, 1);
-            saveProducts();
-            renderProducts();
-            updateMetrics();
+          if (confirm(`Tem certeza que deseja excluir o produto "${product.name}"?`)) {
+            deleteProduct(product.id);
           }
         };
 
@@ -540,76 +366,127 @@
         tr.appendChild(tdCat);
         tr.appendChild(tdPrice);
         tr.appendChild(tdStock);
-        tr.appendChild(tdClicks);
         tr.appendChild(tdActions);
 
         productsList.appendChild(tr);
       });
     }
 
-    // Increment product click count and update metrics
-    function incrementProductClick(index) {
-      const product = products[index];
-      product.clicks = (product.clicks || 0) + 1;
-
-      // Update click metrics for today
-      const today = new Date().toISOString().slice(0, 10);
-      clickMetrics[today] = (clickMetrics[today] || 0) + 1;
-
-      saveProducts();
-      saveClickMetrics();
-      renderProducts();
-      updateMetrics();
-    }
-
-    // Save categories to localStorage
-    function saveCategories() {
-      localStorage.setItem("fideprota_categories", JSON.stringify(categories));
-    }
-
-    // Save products to localStorage
-    function saveProducts() {
-      localStorage.setItem("fideprota_products", JSON.stringify(products));
-    }
-
-    // Save click metrics to localStorage
-    function saveClickMetrics() {
-      localStorage.setItem("fideprota_click_metrics", JSON.stringify(clickMetrics));
-    }
-
-    // Add category form submit
-    addCategoryForm.addEventListener("submit", (e) => {
+    // Add category
+    addCategoryForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const newCat = newCategoryNameInput.value.trim();
-      if (newCat && !categories.includes(newCat)) {
-        categories.push(newCat);
-        saveCategories();
-        renderCategories();
+      if (!newCat) return;
+      try {
+        await db.collection("categories").add({ name: newCat });
         newCategoryNameInput.value = "";
+        await loadData();
+      } catch (error) {
+        alert("Erro ao adicionar categoria: " + error.message);
       }
     });
 
-    // Add product form submit
-    addProductForm.addEventListener("submit", (e) => {
+    // Update category
+    async function updateCategory(oldName, newName) {
+      try {
+        // Find category doc
+        const snapshot = await db.collection("categories").where("name", "==", oldName).get();
+        if (!snapshot.empty) {
+          const docId = snapshot.docs[0].id;
+          await db.collection("categories").doc(docId).update({ name: newName });
+          // Update products with old category name
+          const prodSnapshot = await db.collection("products").where("category", "==", oldName).get();
+          const batch = db.batch();
+          prodSnapshot.forEach(doc => {
+            batch.update(doc.ref, { category: newName });
+          });
+          await batch.commit();
+          await loadData();
+        }
+      } catch (error) {
+        alert("Erro ao atualizar categoria: " + error.message);
+      }
+    }
+
+    // Delete category
+    async function deleteCategory(name) {
+      try {
+        // Delete category doc
+        const snapshot = await db.collection("categories").where("name", "==", name).get();
+        if (!snapshot.empty) {
+          const docId = snapshot.docs[0].id;
+          await db.collection("categories").doc(docId).delete();
+          // Remove category from products
+          const prodSnapshot = await db.collection("products").where("category", "==", name).get();
+          const batch = db.batch();
+          prodSnapshot.forEach(doc => {
+            batch.update(doc.ref, { category: "" });
+          });
+          await batch.commit();
+          await loadData();
+        }
+      } catch (error) {
+        alert("Erro ao excluir categoria: " + error.message);
+      }
+    }
+
+    // Add product
+    addProductForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const name = productNameInput.value.trim();
       const image = productImageInput.value.trim();
       const category = productCategorySelect.value;
       const price = parseFloat(productPriceInput.value);
       const stock = parseInt(productStockInput.value);
-
-      if (name && image && category && !isNaN(price) && !isNaN(stock)) {
-        products.push({ name, image, category, price, stock, clicks: 0 });
-        saveProducts();
-        renderProducts();
+      if (!name || !image || !category || isNaN(price) || isNaN(stock)) return;
+      try {
+        await db.collection("products").add({ name, image, category, price, stock });
         productNameInput.value = "";
         productImageInput.value = "";
         productCategorySelect.value = "";
         productPriceInput.value = "";
         productStockInput.value = "";
-        updateMetrics();
+        await loadData();
+      } catch (error) {
+        alert("Erro ao adicionar produto: " + error.message);
       }
     });
+
+    // Edit product dialog
+    function editProductDialog(product) {
+      const newName = prompt("Editar nome do produto:", product.name);
+      if (!newName || newName.trim() === "") return;
+      const newImage = prompt("Editar URL da imagem:", product.image);
+      if (!newImage || newImage.trim() === "") return;
+      const newCategory = prompt(`Editar categoria:\nCategorias disponíveis:\n${categories.join(", ")}`, product.category);
+      if (newCategory === null) return;
+      const newPrice = prompt("Editar preço (R$):", product.price);
+      if (newPrice === null || isNaN(parseFloat(newPrice))) return;
+      const newStock = prompt("Editar estoque:", product.stock);
+      if (newStock === null || isNaN(parseInt(newStock))) return;
+
+      updateProduct(product.id, newName.trim(), newImage.trim(), newCategory.trim(), parseFloat(newPrice), parseInt(newStock));
+    }
+
+    // Update product
+    async function updateProduct(id, name, image, category, price, stock) {
+      try {
+        await db.collection("products").doc(id).update({ name, image, category, price, stock });
+        await loadData();
+      } catch (error) {
+        alert("Erro ao atualizar produto: " + error.message);
+      }
+    }
+
+    // Delete product
+    async function deleteProduct(id) {
+      try {
+        await db.collection("products").doc(id).delete();
+        await loadData();
+      } catch (error) {
+        alert("Erro ao excluir produto: " + error.message);
+      }
+    }
 
     // Login form submit
     loginForm.addEventListener("submit", (e) => {
@@ -629,100 +506,6 @@
       sessionStorage.removeItem("fideprota_admin_logged_in");
       checkLogin();
     });
-
-    // Edit category dialog form submit
-    editCategoryDialog.querySelector("form").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const newName = editCategoryInput.value.trim();
-      if (newName && editingCategoryIndex !== null) {
-        categories[editingCategoryIndex] = newName;
-        saveCategories();
-        renderCategories();
-        renderProducts();
-        editingCategoryIndex = null;
-        editCategoryDialog.close();
-      }
-    });
-
-    cancelEditCategoryBtn.addEventListener("click", () => {
-      editingCategoryIndex = null;
-      editCategoryDialog.close();
-    });
-
-    // Edit product dialog form submit
-    editProductForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      if (editingProductIndex === null) return;
-
-      const name = editProductName.value.trim();
-      let image = editProductImageUrl.value.trim();
-      const category = editProductCategory.value;
-      const price = parseFloat(editProductPrice.value);
-      const stock = parseInt(editProductStock.value);
-
-      if (!name || !category || isNaN(price) || isNaN(stock)) return;
-
-      // If file input has file, read it as data URL
-      if (editProductImageFile.files.length > 0) {
-        const file = editProductImageFile.files[0];
-        const reader = new FileReader();
-        reader.onload = function (event) {
-          image = event.target.result;
-          updateProduct(editingProductIndex, name, image, category, price, stock);
-          editProductDialog.close();
-          editingProductIndex = null;
-          updateMetrics();
-        };
-        reader.readAsDataURL(file);
-      } else {
-        updateProduct(editingProductIndex, name, image, category, price, stock);
-        editProductDialog.close();
-        editingProductIndex = null;
-        updateMetrics();
-      }
-    });
-
-    cancelEditProductBtn.addEventListener("click", () => {
-      editingProductIndex = null;
-      editProductDialog.close();
-    });
-
-    function updateProduct(index, name, image, category, price, stock) {
-      // Preserve clicks count
-      const clicks = products[index].clicks || 0;
-      products[index] = { name, image, category, price, stock, clicks };
-      saveProducts();
-      renderProducts();
-    }
-
-    // Calculate and update metrics display
-    function updateMetrics() {
-      const metric7d = document.getElementById("metric-7d");
-      const metric30d = document.getElementById("metric-30d");
-      const metricTotal = document.getElementById("metric-total");
-
-      const today = new Date();
-      let clicks7d = 0;
-      let clicks30d = 0;
-      let totalClicks = 0;
-
-      // Sum clicks from products total
-      totalClicks = products.reduce((acc, p) => acc + (p.clicks || 0), 0);
-
-      // Sum clicks from clickMetrics for last 7 and 30 days
-      for (let i = 0; i < 30; i++) {
-        const date = new Date(today);
-        date.setDate(today.getDate() - i);
-        const key = date.toISOString().slice(0, 10);
-        const clicks = clickMetrics[key] || 0;
-        if (i < 7) clicks7d += clicks;
-        clicks30d += clicks;
-      }
-
-      metric7d.textContent = clicks7d;
-      metric30d.textContent = clicks30d;
-      metricTotal.textContent = totalClicks;
-    }
 
     // Initial check
     checkLogin();
