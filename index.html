@@ -1,11 +1,703 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="scroll-smooth">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; URL='admin/'" />
-  <title>Redirecionando...</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FIDEPROTA STORE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: #f9fafb;
+    }
+    /* Scrollbar hide for overflow-x */
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Custom scrollbar for category bar */
+    .category-scrollbar::-webkit-scrollbar {
+      height: 6px;
+    }
+    .category-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .category-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #a78bfa;
+      border-radius: 3px;
+    }
+    /* Banner slider styles */
+    .banner-slider {
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: smooth;
+    }
+    .banner-slide {
+      scroll-snap-align: start;
+      flex-shrink: 0;
+      width: 100%;
+      height: 300px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 0.75rem; /* rounded-lg */
+      box-shadow: 0 10px 15px -3px rgb(107 33 168 / 0.3), 0 4px 6px -4px rgb(107 33 168 / 0.2);
+    }
+    .banner-slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    /* Hide scrollbar for banner slider */
+    .banner-slider::-webkit-scrollbar {
+      display: none;
+    }
+    .banner-slider {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              DEFAULT: '#6b21a8', // purple-700
+              dark: '#581c87', // purple-800
+              light: '#a78bfa', // purple-400
+            },
+          },
+        },
+      },
+    };
+  </script>
 </head>
-<body>
-  Redirecionando para o Painel Admin...
+<body class="text-gray-900">
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="max-w-[1280px] mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <img
+          src="https://storage.googleapis.com/a1aa/image/a25389be-b350-4343-cacb-58a32c490c24.jpg"
+          alt="FIDEPROTA STORE logo"
+          width="36"
+          height="36"
+          class="object-contain"
+        />
+        <span class="text-primary font-bold text-xl select-none">FIDEPROTA STORE</span>
+      </div>
+      <form
+        role="search"
+        aria-label="Search form"
+        class="relative max-w-md w-full hidden sm:flex items-center bg-gray-100 rounded-full px-4 py-2"
+      >
+        <i class="fas fa-search text-gray-400 text-base"></i>
+        <input
+          type="search"
+          placeholder="Buscar produtos ou categorias"
+          aria-label="Search input"
+          class="bg-transparent text-sm text-gray-600 placeholder-gray-400 focus:outline-none ml-3 w-full"
+        />
+      </form>
+      <nav class="flex items-center space-x-6 text-gray-600">
+        <button
+          aria-label="Carrinho"
+          class="relative hover:text-primary transition"
+          id="cart-button"
+          title="Carrinho"
+        >
+          <i class="fas fa-shopping-cart text-xl"></i>
+          <span
+            id="cart-count"
+            class="absolute -top-2 -right-2 bg-primary text-white rounded-full text-xs w-5 h-5 flex items-center justify-center font-semibold select-none"
+            >0</span
+          >
+        </button>
+        <button
+          aria-label="Menu"
+          class="text-gray-600 hover:text-primary transition text-2xl sm:hidden"
+          id="menu-button"
+          title="Menu"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+      </nav>
+    </div>
+  </header>
+  <main class="max-w-[1280px] mx-auto px-6 mt-8">
+    <!-- Banner Slider -->
+    <section aria-label="Banners promocionais" class="mb-8">
+      <div
+        class="banner-slider flex overflow-x-auto scrollbar-hide snap-x gap-4"
+        id="banner-slider"
+      >
+        <div class="banner-slide">
+          <img
+            src="https://storage.googleapis.com/a1aa/image/2b9870d4-8a04-47b1-ac41-7d01e23d2a33.jpg"
+            alt="Banner promocional 1 com texto Promoção Especial 1"
+            loading="lazy"
+          />
+        </div>
+        <div class="banner-slide">
+          <img
+            src="https://storage.googleapis.com/a1aa/image/af8adaa3-280d-4315-6da8-cd129844d0aa.jpg"
+            alt="Banner promocional 2 com texto Promoção Especial 2"
+            loading="lazy"
+          />
+        </div>
+        <div class="banner-slide">
+          <img
+            src="https://storage.googleapis.com/a1aa/image/f11e786f-03d9-46a8-82fe-29f94987fd7b.jpg"
+            alt="Banner promocional 3 com texto Promoção Especial 3"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </section>
+    <!-- Categories Bar -->
+    <section aria-label="Categorias populares" class="mb-8">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-800 select-none">Categorias Populares</h2>
+        <button
+          id="show-all-categories"
+          class="text-primary text-sm font-semibold hover:underline focus:outline-none"
+          aria-expanded="false"
+          aria-controls="all-categories"
+        >
+          Ver mais
+        </button>
+      </div>
+      <ul
+        id="popular-categories"
+        class="flex space-x-4 overflow-x-auto category-scrollbar pb-2"
+        role="list"
+      >
+        <!-- Popular categories inserted here -->
+      </ul>
+      <ul
+        id="all-categories"
+        class="hidden mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"
+        role="list"
+      >
+        <!-- All categories inserted here -->
+      </ul>
+    </section>
+    <!-- Products Section -->
+    <section aria-label="Produtos" class="mb-12">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-gray-800 select-none">Produtos</h2>
+        <button
+          id="load-more-products"
+          class="text-primary text-sm font-semibold hover:underline focus:outline-none"
+        >
+          Ver mais
+        </button>
+      </div>
+      <ul
+        id="product-list"
+        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
+        role="list"
+      >
+        <!-- Products inserted here -->
+      </ul>
+    </section>
+  </main>
+  <!-- Cart Modal -->
+  <dialog id="cart-modal" class="rounded-lg p-6 w-full max-w-lg">
+    <h3 class="text-xl font-semibold mb-4 text-primary">Carrinho de Compras</h3>
+    <ul id="cart-items" class="divide-y divide-gray-200 max-h-64 overflow-y-auto mb-4">
+      <!-- Cart items here -->
+    </ul>
+    <div class="flex justify-between font-semibold text-gray-800 mb-4">
+      <span>Total:</span>
+      <span id="cart-total">R$ 0,00</span>
+    </div>
+    <button
+      id="checkout-button"
+      class="w-full bg-primary text-white py-2 rounded hover:bg-primary-dark transition font-semibold"
+    >
+      Finalizar compra via WhatsApp
+    </button>
+    <button
+      id="close-cart"
+      class="mt-3 w-full border border-gray-300 py-2 rounded hover:bg-gray-100 transition font-semibold"
+    >
+      Fechar
+    </button>
+  </dialog>
+  <script>
+    // Data (categories and products)
+    let categories = JSON.parse(localStorage.getItem("fideprota_categories")) || [
+      "Genshin Impact",
+      "League of Legends",
+      "Clash of Clans",
+      "Throne of Liberty",
+      "Fortnite",
+      "Valorant",
+      "Free Fire",
+      "Roblox",
+      "Minecraft",
+      "Among Us",
+      "Call of Duty",
+      "Apex Legends",
+      "PUBG",
+      "FIFA",
+      "CS:GO",
+    ];
+
+    let products = JSON.parse(localStorage.getItem("fideprota_products")) || [
+      {
+        name: "Genshin Impact Account",
+        image:
+          "https://storage.googleapis.com/a1aa/image/10490fa4-3ec2-4d9f-4ae6-385e51c523dc.jpg",
+        category: "Genshin Impact",
+        price: 50.0,
+        stock: 10,
+        clicks: 120,
+      },
+      {
+        name: "League of Legends Skin",
+        image:
+          "https://storage.googleapis.com/a1aa/image/cf38c57a-de58-4f20-c8b2-3f0e925309b7.jpg",
+        category: "League of Legends",
+        price: 30.0,
+        stock: 5,
+        clicks: 80,
+      },
+      {
+        name: "Clash of Clans Gems",
+        image:
+          "https://storage.googleapis.com/a1aa/image/4d5e577d-16f0-44a5-c1a7-31f85a3932ce.jpg",
+        category: "Clash of Clans",
+        price: 20.0,
+        stock: 15,
+        clicks: 60,
+      },
+      {
+        name: "Fortnite V-Bucks",
+        image:
+          "https://storage.googleapis.com/a1aa/image/f985ed8f-e4ee-4aae-5757-9a64f099cbeb.jpg",
+        category: "Fortnite",
+        price: 40.0,
+        stock: 8,
+        clicks: 90,
+      },
+      {
+        name: "Minecraft Account",
+        image:
+          "https://storage.googleapis.com/a1aa/image/f677ce06-28a0-482b-4b4d-945a5422fe09.jpg",
+        category: "Minecraft",
+        price: 25.0,
+        stock: 12,
+        clicks: 50,
+      },
+      {
+        name: "Among Us Account",
+        image:
+          "https://placehold.co/600x400/png?text=Among+Us+Account",
+        category: "Among Us",
+        price: 15.0,
+        stock: 20,
+        clicks: 30,
+      },
+      {
+        name: "Call of Duty Points",
+        image:
+          "https://placehold.co/600x400/png?text=Call+of+Duty+Points",
+        category: "Call of Duty",
+        price: 35.0,
+        stock: 7,
+        clicks: 45,
+      },
+      {
+        name: "Apex Legends Skin",
+        image:
+          "https://placehold.co/600x400/png?text=Apex+Legends+Skin",
+        category: "Apex Legends",
+        price: 28.0,
+        stock: 9,
+        clicks: 25,
+      },
+      {
+        name: "PUBG UC",
+        image:
+          "https://placehold.co/600x400/png?text=PUBG+UC",
+        category: "PUBG",
+        price: 22.0,
+        stock: 14,
+        clicks: 40,
+      },
+      {
+        name: "FIFA Coins",
+        image:
+          "https://placehold.co/600x400/png?text=FIFA+Coins",
+        category: "FIFA",
+        price: 18.0,
+        stock: 11,
+        clicks: 35,
+      },
+      {
+        name: "CS:GO Skins",
+        image:
+          "https://placehold.co/600x400/png?text=CS:GO+Skins",
+        category: "CS:GO",
+        price: 45.0,
+        stock: 6,
+        clicks: 55,
+      },
+    ];
+
+    // Popular categories (top 8)
+    const popularCategories = categories.slice(0, 8);
+
+    // Elements
+    const popularCategoriesList = document.getElementById("popular-categories");
+    const allCategoriesList = document.getElementById("all-categories");
+    const showAllCategoriesBtn = document.getElementById("show-all-categories");
+    const productList = document.getElementById("product-list");
+    const loadMoreProductsBtn = document.getElementById("load-more-products");
+    const cartButton = document.getElementById("cart-button");
+    const cartCount = document.getElementById("cart-count");
+    const cartModal = document.getElementById("cart-modal");
+    const cartItemsList = document.getElementById("cart-items");
+    const cartTotal = document.getElementById("cart-total");
+    const checkoutButton = document.getElementById("checkout-button");
+    const closeCartButton = document.getElementById("close-cart");
+
+    // Cart data
+    let cart = JSON.parse(sessionStorage.getItem("fideprota_cart")) || [];
+
+    // Products pagination
+    let productsToShow = 10;
+
+    // Render popular categories
+    function renderPopularCategories() {
+      popularCategoriesList.innerHTML = "";
+      popularCategories.forEach((cat) => {
+        const li = document.createElement("li");
+        li.className =
+          "flex flex-col items-center min-w-[80px] cursor-pointer hover:text-primary transition select-none";
+        li.setAttribute("tabindex", "0");
+        li.setAttribute("role", "button");
+        li.setAttribute("aria-label", `Filtrar categoria ${cat}`);
+
+        const circle = document.createElement("div");
+        circle.className =
+          "w-14 h-14 rounded-full bg-primary-light flex items-center justify-center mb-2";
+
+        const icon = document.createElement("i");
+        icon.className = "fas fa-gamepad text-primary text-xl";
+
+        circle.appendChild(icon);
+
+        const span = document.createElement("span");
+        span.className = "text-xs font-semibold text-center truncate w-full";
+        span.textContent = cat;
+
+        li.appendChild(circle);
+        li.appendChild(span);
+
+        li.onclick = () => {
+          renderProducts(cat);
+        };
+        li.onkeypress = (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            renderProducts(cat);
+          }
+        };
+
+        popularCategoriesList.appendChild(li);
+      });
+    }
+
+    // Render all categories grid
+    function renderAllCategories() {
+      allCategoriesList.innerHTML = "";
+      categories.forEach((cat) => {
+        const li = document.createElement("li");
+        li.className =
+          "cursor-pointer rounded-md border border-gray-300 px-3 py-2 text-center text-sm font-medium text-gray-700 hover:bg-primary-light hover:text-primary transition select-none truncate";
+        li.setAttribute("tabindex", "0");
+        li.setAttribute("role", "button");
+        li.setAttribute("aria-label", `Filtrar categoria ${cat}`);
+
+        li.textContent = cat;
+
+        li.onclick = () => {
+          renderProducts(cat);
+          toggleCategories(false);
+        };
+        li.onkeypress = (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            renderProducts(cat);
+            toggleCategories(false);
+          }
+        };
+
+        allCategoriesList.appendChild(li);
+      });
+    }
+
+    // Toggle all categories visibility
+    function toggleCategories(show) {
+      if (show) {
+        allCategoriesList.classList.remove("hidden");
+        showAllCategoriesBtn.textContent = "Ver menos";
+        showAllCategoriesBtn.setAttribute("aria-expanded", "true");
+      } else {
+        allCategoriesList.classList.add("hidden");
+        showAllCategoriesBtn.textContent = "Ver mais";
+        showAllCategoriesBtn.setAttribute("aria-expanded", "false");
+      }
+    }
+
+    showAllCategoriesBtn.addEventListener("click", () => {
+      const isHidden = allCategoriesList.classList.contains("hidden");
+      toggleCategories(isHidden);
+    });
+
+    // Render products with optional category filter
+    function renderProducts(filterCategory = null) {
+      productList.innerHTML = "";
+      let filteredProducts = products;
+      if (filterCategory) {
+        filteredProducts = products.filter((p) => p.category === filterCategory);
+      }
+      if (filteredProducts.length === 0) {
+        const noProd = document.createElement("p");
+        noProd.className = "text-gray-500 col-span-full text-center";
+        noProd.textContent = "Nenhum produto encontrado.";
+        productList.appendChild(noProd);
+        loadMoreProductsBtn.classList.add("hidden");
+        return;
+      }
+      const toRender = filteredProducts.slice(0, productsToShow);
+      toRender.forEach((product) => {
+        const li = document.createElement("li");
+        li.className =
+          "bg-white border border-gray-200 rounded-md overflow-hidden shadow-sm flex flex-col";
+
+        const img = document.createElement("img");
+        img.src = product.image;
+        img.alt = product.name;
+        img.className = "w-full h-40 object-cover";
+
+        const div = document.createElement("div");
+        div.className = "p-4 flex flex-col flex-grow";
+
+        const name = document.createElement("h3");
+        name.className = "text-sm font-semibold text-gray-900 truncate";
+        name.textContent = product.name;
+
+        const price = document.createElement("p");
+        price.className = "text-primary font-bold mt-1";
+        price.textContent = `R$ ${product.price.toFixed(2)}`;
+
+        const stock = document.createElement("p");
+        stock.className = "text-xs text-gray-500 mt-1";
+        stock.textContent = `Estoque: ${product.stock}`;
+
+        const btn = document.createElement("button");
+        btn.className =
+          "mt-auto bg-primary text-white py-2 rounded hover:bg-primary-dark transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed";
+        btn.textContent = product.stock > 0 ? "Adicionar ao carrinho" : "Indisponível";
+        btn.disabled = product.stock <= 0;
+        btn.onclick = () => {
+          addToCart(product);
+        };
+
+        div.appendChild(name);
+        div.appendChild(price);
+        div.appendChild(stock);
+        div.appendChild(btn);
+
+        li.appendChild(img);
+        li.appendChild(div);
+
+        productList.appendChild(li);
+      });
+
+      if (productsToShow >= filteredProducts.length) {
+        loadMoreProductsBtn.classList.add("hidden");
+      } else {
+        loadMoreProductsBtn.classList.remove("hidden");
+      }
+    }
+
+    loadMoreProductsBtn.addEventListener("click", () => {
+      productsToShow += 10;
+      renderProducts();
+    });
+
+    // Cart management
+    let cart = JSON.parse(sessionStorage.getItem("fideprota_cart")) || [];
+
+    function updateCartCount() {
+      const count = cart.reduce((acc, item) => acc + item.quantity, 0);
+      cartCount.textContent = count;
+    }
+
+    function addToCart(product) {
+      const existing = cart.find((item) => item.name === product.name);
+      if (existing) {
+        if (existing.quantity < product.stock) {
+          existing.quantity++;
+        } else {
+          alert("Quantidade máxima em estoque atingida.");
+          return;
+        }
+      } else {
+        cart.push({ ...product, quantity: 1 });
+      }
+      sessionStorage.setItem("fideprota_cart", JSON.stringify(cart));
+      updateCartCount();
+      alert(`Produto "${product.name}" adicionado ao carrinho.`);
+    }
+
+    function renderCart() {
+      cartItemsList.innerHTML = "";
+      if (cart.length === 0) {
+        const li = document.createElement("li");
+        li.className = "text-center text-gray-500 py-4";
+        li.textContent = "Seu carrinho está vazio.";
+        cartItemsList.appendChild(li);
+        cartTotal.textContent = "R$ 0,00";
+        checkoutButton.disabled = true;
+        return;
+      }
+      checkoutButton.disabled = false;
+      let total = 0;
+      cart.forEach((item, index) => {
+        total += item.price * item.quantity;
+        const li = document.createElement("li");
+        li.className = "flex items-center justify-between py-3";
+
+        const infoDiv = document.createElement("div");
+        infoDiv.className = "flex items-center space-x-3";
+
+        const img = document.createElement("img");
+        img.src = item.image;
+        img.alt = item.name;
+        img.className = "w-12 h-12 object-cover rounded";
+
+        const namePriceDiv = document.createElement("div");
+        namePriceDiv.className = "flex flex-col";
+
+        const name = document.createElement("span");
+        name.className = "text-sm font-semibold";
+        name.textContent = item.name;
+
+        const price = document.createElement("span");
+        price.className = "text-xs text-gray-600";
+        price.textContent = `R$ ${item.price.toFixed(2)} x ${item.quantity}`;
+
+        namePriceDiv.appendChild(name);
+        namePriceDiv.appendChild(price);
+
+        infoDiv.appendChild(img);
+        infoDiv.appendChild(namePriceDiv);
+
+        const qtyDiv = document.createElement("div");
+        qtyDiv.className = "flex items-center space-x-2";
+
+        const minusBtn = document.createElement("button");
+        minusBtn.className = "text-primary font-bold px-2 hover:text-primary-dark";
+        minusBtn.textContent = "−";
+        minusBtn.title = "Diminuir quantidade";
+        minusBtn.onclick = () => {
+          if (item.quantity > 1) {
+            item.quantity--;
+          } else {
+            cart.splice(index, 1);
+          }
+          sessionStorage.setItem("fideprota_cart", JSON.stringify(cart));
+          renderCart();
+          updateCartCount();
+        };
+
+        const qtySpan = document.createElement("span");
+        qtySpan.className = "w-6 text-center";
+        qtySpan.textContent = item.quantity;
+
+        const plusBtn = document.createElement("button");
+        plusBtn.className = "text-primary font-bold px-2 hover:text-primary-dark";
+        plusBtn.textContent = "+";
+        plusBtn.title = "Aumentar quantidade";
+        plusBtn.onclick = () => {
+          if (item.quantity < item.stock) {
+            item.quantity++;
+            sessionStorage.setItem("fideprota_cart", JSON.stringify(cart));
+            renderCart();
+            updateCartCount();
+          } else {
+            alert("Quantidade máxima em estoque atingida.");
+          }
+        };
+
+        qtyDiv.appendChild(minusBtn);
+        qtyDiv.appendChild(qtySpan);
+        qtyDiv.appendChild(plusBtn);
+
+        li.appendChild(infoDiv);
+        li.appendChild(qtyDiv);
+
+        cartItemsList.appendChild(li);
+      });
+      cartTotal.textContent = `R$ ${total.toFixed(2)}`;
+    }
+
+    // Checkout: send cart info to WhatsApp
+    checkoutButton.addEventListener("click", () => {
+      if (cart.length === 0) return;
+      const phone = "5538998848759";
+      let message = "Olá, gostaria de comprar os seguintes produtos:\n\n";
+      cart.forEach((item) => {
+        message += `- ${item.name} (x${item.quantity}) - R$ ${(item.price * item.quantity).toFixed(2)}\n`;
+      });
+      message += `\nTotal: R$ ${cart.reduce((acc, i) => acc + i.price * i.quantity, 0).toFixed(2)}\n\nPor favor, entre em contato para finalizar a compra.`;
+      const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+      window.open(url, "_blank");
+    });
+
+    // Cart modal open/close
+    cartButton.addEventListener("click", () => {
+      renderCart();
+      cartModal.showModal();
+    });
+    closeCartButton.addEventListener("click", () => {
+      cartModal.close();
+    });
+
+    // Close modal on outside click
+    cartModal.addEventListener("click", (e) => {
+      const rect = cartModal.getBoundingClientRect();
+      if (
+        e.clientX < rect.left ||
+        e.clientX > rect.right ||
+        e.clientY < rect.top ||
+        e.clientY > rect.bottom
+      ) {
+        cartModal.close();
+      }
+    });
+
+    // Initial render
+    renderPopularCategories();
+    renderAllCategories();
+    renderProducts();
+    updateCartCount();
+  </script>
 </body>
 </html>
