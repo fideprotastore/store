@@ -1,0 +1,219 @@
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Criar Conta - Minha Loja</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1a0536 0%, #2e0a5a 100%);
+      color: #ddd;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    ::placeholder {
+      color: #cbb7ff;
+      opacity: 1;
+    }
+    /* Custom scrollbar for form container */
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background-color: #9f7aea;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body class="flex-grow flex flex-col justify-center items-center px-4 py-12">
+
+  <main class="bg-black bg-opacity-70 rounded-3xl shadow-2xl max-w-md w-full p-10 scrollbar-thin overflow-y-auto max-h-[90vh]">
+    <h1 class="text-5xl font-extrabold text-purple-400 mb-10 text-center tracking-wider select-none drop-shadow-lg">Criar Conta</h1>
+
+    <form id="createAccountForm" class="space-y-7" novalidate>
+      <div>
+        <label for="fullName" class="block text-purple-300 font-semibold mb-2 tracking-wide">Nome Completo</label>
+        <input
+          type="text"
+          id="fullName"
+          name="fullName"
+          placeholder="Seu nome completo"
+          class="w-full bg-gradient-to-r from-purple-900 to-purple-800 border border-purple-700 rounded-xl p-4 text-purple-200 placeholder-purple-400 focus:outline-none focus:ring-4 focus:ring-purple-600 transition-shadow shadow-purple-700"
+          required
+          autocomplete="name"
+          minlength="3"
+          maxlength="100"
+          aria-describedby="fullNameHelp"
+          spellcheck="false"
+        />
+        <p id="fullNameHelp" class="text-purple-500 text-sm mt-1 select-none">Digite seu nome completo.</p>
+      </div>
+
+      <div>
+        <label for="email" class="block text-purple-300 font-semibold mb-2 tracking-wide">E-mail</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="exemplo@dominio.com"
+          class="w-full bg-gradient-to-r from-purple-900 to-purple-800 border border-purple-700 rounded-xl p-4 text-purple-200 placeholder-purple-400 focus:outline-none focus:ring-4 focus:ring-purple-600 transition-shadow shadow-purple-700"
+          required
+          autocomplete="email"
+          aria-describedby="emailHelp"
+          spellcheck="false"
+        />
+        <p id="emailHelp" class="text-purple-500 text-sm mt-1 select-none">Informe um e-mail válido para login.</p>
+      </div>
+
+      <div>
+        <label for="password" class="block text-purple-300 font-semibold mb-2 tracking-wide">Senha</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Crie uma senha segura"
+          class="w-full bg-gradient-to-r from-purple-900 to-purple-800 border border-purple-700 rounded-xl p-4 text-purple-200 placeholder-purple-400 focus:outline-none focus:ring-4 focus:ring-purple-600 transition-shadow shadow-purple-700"
+          required
+          minlength="8"
+          autocomplete="new-password"
+          aria-describedby="passwordHelp"
+          spellcheck="false"
+        />
+        <p id="passwordHelp" class="text-purple-500 text-sm mt-1 select-none">Mínimo 8 caracteres.</p>
+      </div>
+
+      <div>
+        <label for="confirmPassword" class="block text-purple-300 font-semibold mb-2 tracking-wide">Confirmar Senha</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          placeholder="Repita sua senha"
+          class="w-full bg-gradient-to-r from-purple-900 to-purple-800 border border-purple-700 rounded-xl p-4 text-purple-200 placeholder-purple-400 focus:outline-none focus:ring-4 focus:ring-purple-600 transition-shadow shadow-purple-700"
+          required
+          minlength="8"
+          autocomplete="new-password"
+          aria-describedby="confirmPasswordHelp"
+          spellcheck="false"
+        />
+        <p id="confirmPasswordHelp" class="text-purple-500 text-sm mt-1 select-none">Repita a senha para confirmação.</p>
+      </div>
+
+      <button
+        type="submit"
+        class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-extrabold py-4 rounded-3xl transition-all shadow-lg shadow-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-500"
+      >
+        Criar Conta
+      </button>
+
+      <p id="formStatus" class="mt-5 text-center text-sm select-none"></p>
+
+      <p class="mt-8 text-center text-purple-300 select-none">
+        Já tem uma conta?
+        <a href="login.html" class="text-purple-400 font-semibold hover:text-purple-600 underline focus:outline-none focus:ring-2 focus:ring-purple-500 rounded">Faça login aqui</a>
+      </p>
+    </form>
+  </main>
+
+  <footer class="mt-12 mb-6 text-center text-purple-400 text-sm select-none">
+    &copy; 2024 Minha Loja. Todos os direitos reservados.
+  </footer>
+
+  <script>
+    const form = document.getElementById('createAccountForm');
+    const formStatus = document.getElementById('formStatus');
+
+    // Função simples para validar email
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    // Função para salvar usuário no localStorage (simulado)
+    function saveUser(user) {
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      users.push(user);
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+
+    // Função para verificar se email já existe
+    function emailExists(email) {
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      return users.some(u => u.email.toLowerCase() === email.toLowerCase());
+    }
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      formStatus.textContent = '';
+      formStatus.className = 'mt-5 text-center text-sm select-none';
+
+      const fullName = form.fullName.value.trim();
+      const email = form.email.value.trim();
+      const password = form.password.value;
+      const confirmPassword = form.confirmPassword.value;
+
+      if (fullName.length < 3) {
+        formStatus.textContent = 'O nome completo deve ter pelo menos 3 caracteres.';
+        formStatus.classList.add('text-red-500');
+        form.fullName.focus();
+        return;
+      }
+
+      if (!isValidEmail(email)) {
+        formStatus.textContent = 'Por favor, informe um e-mail válido.';
+        formStatus.classList.add('text-red-500');
+        form.email.focus();
+        return;
+      }
+
+      if (emailExists(email)) {
+        formStatus.textContent = 'Este e-mail já está cadastrado.';
+        formStatus.classList.add('text-red-500');
+        form.email.focus();
+        return;
+      }
+
+      if (password.length < 8) {
+        formStatus.textContent = 'A senha deve ter pelo menos 8 caracteres.';
+        formStatus.classList.add('text-red-500');
+        form.password.focus();
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        formStatus.textContent = 'As senhas não coincidem.';
+        formStatus.classList.add('text-red-500');
+        form.confirmPassword.focus();
+        return;
+      }
+
+      // Simula criação de conta (armazenar localmente)
+      const newUser = {
+        id: 'user_' + Math.random().toString(36).substr(2, 9),
+        fullName,
+        email,
+        password, // Em app real, nunca salvar senha em texto puro
+        createdAt: new Date().toISOString(),
+      };
+
+      saveUser(newUser);
+
+      formStatus.textContent = 'Conta criada com sucesso! Você pode agora fazer login.';
+      formStatus.classList.remove('text-red-500');
+      formStatus.classList.add('text-green-400');
+
+      form.reset();
+    });
+  </script>
+</body>
+</html>
