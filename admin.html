@@ -2,7 +2,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Painel Administrativo - Minha Loja</title>
+  <title>Painel Admin - Minha Loja</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link
     rel="stylesheet"
@@ -15,625 +15,698 @@
   <style>
     body {
       font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1a0536 0%, #2e0a5a 100%);
+      color: #ddd;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
-    /* Scrollbar custom for product list */
+    ::placeholder {
+      color: #cbb7ff;
+      opacity: 1;
+    }
+    /* Scrollbar for tables and lists */
     .scrollbar-thin::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
     .scrollbar-thin::-webkit-scrollbar-thumb {
-      background-color: rgba(99, 102, 241, 0.6);
+      background-color: #9f7aea;
       border-radius: 3px;
     }
   </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col">
-  <header class="bg-white shadow-md sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
-      <h1 class="text-2xl font-semibold text-indigo-600">Painel Administrativo</h1>
-      <nav>
-        <a href="index.html" class="text-gray-700 hover:text-indigo-600 font-medium px-3 py-2 rounded-md">Loja</a>
-        <a href="admin.html" class="text-indigo-600 font-semibold px-3 py-2 rounded-md">Painel Admin</a>
+<body class="flex flex-col min-h-screen">
+
+  <!-- Login Modal -->
+  <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 px-4">
+    <div class="bg-black bg-opacity-80 rounded-3xl p-10 max-w-md w-full shadow-2xl">
+      <h2 class="text-4xl font-extrabold text-purple-400 mb-8 text-center select-none drop-shadow-lg">Painel Admin - Login</h2>
+      <form id="loginForm" class="space-y-6" novalidate>
+        <div>
+          <label for="adminPasswordInput" class="block text-purple-300 font-semibold mb-2 tracking-wide">Senha</label>
+          <input
+            type="password"
+            id="adminPasswordInput"
+            name="adminPasswordInput"
+            placeholder="Digite a senha do painel"
+            class="w-full bg-gradient-to-r from-purple-900 to-purple-800 border border-purple-700 rounded-xl p-4 text-purple-200 placeholder-purple-400 focus:outline-none focus:ring-4 focus:ring-purple-600 transition-shadow shadow-purple-700"
+            required
+            autocomplete="current-password"
+            spellcheck="false"
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-extrabold py-4 rounded-3xl transition-all shadow-lg shadow-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-500"
+        >
+          Entrar
+        </button>
+        <p id="loginStatus" class="mt-4 text-center text-sm text-red-500 select-none"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Admin Panel -->
+  <div id="adminPanel" class="hidden flex flex-col min-h-screen">
+
+    <header class="bg-black bg-opacity-70 shadow-lg p-6 flex flex-col md:flex-row md:items-center md:justify-between max-w-7xl mx-auto w-full rounded-b-3xl">
+      <h1 class="text-4xl font-extrabold text-purple-400 tracking-wide select-none drop-shadow-lg mb-4 md:mb-0">Painel Admin</h1>
+      <nav class="flex space-x-6 text-purple-300 font-semibold select-none">
+        <button id="tabUsersBtn" class="hover:text-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded transition">Usuários</button>
+        <button id="tabPaymentsBtn" class="hover:text-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded transition">Pagamentos</button>
+        <button id="tabStatsBtn" class="hover:text-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded transition">Estatísticas</button>
+        <button id="tabSettingsBtn" class="hover:text-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded transition">Configurações</button>
       </nav>
-    </div>
-  </header>
+    </header>
 
-  <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <h2 class="text-3xl font-semibold text-gray-800 mb-8 text-center">Gerenciamento de Categorias e Produtos</h2>
-
-    <div class="flex flex-col md:flex-row gap-8">
-      <!-- CATEGORIAS -->
-      <section class="md:w-1/3 bg-white rounded-lg shadow-md p-6 flex flex-col">
-        <h3 class="text-xl font-semibold text-indigo-700 mb-4 flex items-center justify-between">
-          Categorias
-          <button id="btnAddCategory" class="text-indigo-600 hover:text-indigo-800" title="Adicionar Categoria" aria-label="Adicionar Categoria">
-            <i class="fas fa-plus-circle fa-lg"></i>
-          </button>
-        </h3>
-        <ul id="categoryList" class="flex-grow overflow-y-auto scrollbar-thin border border-gray-200 rounded-md divide-y divide-gray-200">
-          <!-- Lista de categorias será inserida aqui -->
-        </ul>
-      </section>
-
-      <!-- PRODUTOS -->
-      <section class="md:w-2/3 bg-white rounded-lg shadow-md p-6 flex flex-col">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-xl font-semibold text-indigo-700">Produtos</h3>
-          <button id="btnAddProduct" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-1.5 px-4 rounded-md disabled:opacity-50" disabled>
-            <i class="fas fa-plus mr-2"></i>Adicionar Produto
-          </button>
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 py-8">
+      <!-- Usuários -->
+      <section id="tabUsers" class="space-y-10">
+        <h2 class="text-3xl font-bold text-purple-400 mb-6 select-none drop-shadow-md">Lista de Usuários</h2>
+        <div class="overflow-x-auto rounded-2xl shadow-lg scrollbar-thin">
+          <table class="min-w-full bg-black bg-opacity-70 rounded-2xl text-purple-200">
+            <thead>
+              <tr class="border-b border-purple-700">
+                <th class="text-left py-3 px-5 font-semibold tracking-wide">ID</th>
+                <th class="text-left py-3 px-5 font-semibold tracking-wide">Nome Completo</th>
+                <th class="text-left py-3 px-5 font-semibold tracking-wide">E-mail</th>
+                <th class="text-left py-3 px-5 font-semibold tracking-wide">Data de Criação</th>
+                <th class="text-center py-3 px-5 font-semibold tracking-wide">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody" class="divide-y divide-purple-700">
+              <!-- Usuários serão inseridos aqui via JS -->
+            </tbody>
+          </table>
         </div>
-        <p id="selectedCategoryName" class="text-gray-600 mb-4 italic">Selecione uma categoria para gerenciar os produtos.</p>
-        <ul id="productList" class="flex-grow overflow-y-auto scrollbar-thin border border-gray-200 rounded-md divide-y divide-gray-200">
-          <!-- Lista de produtos será inserida aqui -->
-        </ul>
-      </section>
-    </div>
 
-    <!-- FORMULÁRIO MODAL -->
-    <div id="modalContainer" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-      <div class="bg-white rounded-lg max-w-lg w-full p-6 relative shadow-lg max-h-[90vh] overflow-y-auto">
-        <button id="modalCloseBtn" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold" aria-label="Fechar modal">&times;</button>
-        <h3 id="modalTitle" class="text-2xl font-semibold text-gray-800 mb-6"></h3>
-        <form id="modalForm" class="space-y-4" novalidate>
-          <!-- Campos do formulário serão inseridos dinamicamente -->
+        <h2 class="text-3xl font-bold text-purple-400 mb-6 select-none drop-shadow-md">Adicionar Novo Usuário</h2>
+        <form id="addUserForm" class="space-y-6 max-w-md bg-black bg-opacity-70 rounded-3xl p-8 shadow-lg">
+          <div>
+            <label for="adminFullName" class="block text-purple-300 font-semibold mb-2 tracking-wide">Nome Completo</label>
+            <input
+              type="text"
+              id="adminFullName"
+              name="adminFullName"
+              placeholder="Nome completo do usuário"
+              class="w-full bg-gradient-to-r from-purple-900 to-purple-800 border border-purple-700 rounded-xl p-4 text-purple-200 placeholder-purple-400 focus:outline-none focus:ring-4 focus:ring-purple-600 transition-shadow shadow-purple-700"
+              required
+              minlength="3"
+              maxlength="100"
+              spellcheck="false"
+              autocomplete="off"
+            />
+          </div>
+
+          <div>
+            <label for="adminEmail" class="block text-purple-300 font-semibold mb-2 tracking-wide">E-mail</label>
+            <input
+              type="email"
+              id="adminEmail"
+              name="adminEmail"
+              placeholder="exemplo@dominio.com"
+              class="w-full bg-gradient-to-r from-purple-900 to-purple-800 border border-purple-700 rounded-xl p-4 text-purple-200 placeholder-purple-400 focus:outline-none focus:ring-4 focus:ring-purple-600 transition-shadow shadow-purple-700"
+              required
+              spellcheck="false"
+              autocomplete="off"
+            />
+          </div>
+
+          <div>
+            <label for="adminPassword" class="block text-purple-300 font-semibold mb-2 tracking-wide">Senha</label>
+            <input
+              type="password"
+              id="adminPassword"
+              name="adminPassword"
+              placeholder="Senha segura"
+              class="w-full bg-gradient-to-r from-purple-900 to-purple-800 border border-purple-700 rounded-xl p-4 text-purple-200 placeholder-purple-400 focus:outline-none focus:ring-4 focus:ring-purple-600 transition-shadow shadow-purple-700"
+              required
+              minlength="8"
+              autocomplete="new-password"
+              spellcheck="false"
+            />
+            <p class="text-purple-500 text-sm mt-1 select-none">Mínimo 8 caracteres.</p>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-extrabold py-4 rounded-3xl transition-all shadow-lg shadow-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-500"
+          >
+            Adicionar Usuário
+          </button>
+
+          <p id="addUserStatus" class="mt-4 text-center text-sm select-none"></p>
         </form>
-        <div class="flex justify-end mt-6 space-x-3">
-          <button id="modalCancelBtn" type="button" class="px-4 py-2 rounded-md border border-gray-300 hover:border-gray-400 text-gray-700 font-semibold">Cancelar</button>
-          <button id="modalSaveBtn" type="submit" class="px-5 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Salvar</button>
-        </div>
-      </div>
-    </div>
-  </main>
+      </section>
 
-  <footer class="bg-white border-t border-gray-200 py-6 mt-12">
-    <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
+      <!-- Pagamentos -->
+      <section id="tabPayments" class="hidden space-y-10">
+        <h2 class="text-3xl font-bold text-purple-400 mb-6 select-none drop-shadow-md">Histórico de Pagamentos</h2>
+        <div class="overflow-x-auto rounded-2xl shadow-lg scrollbar-thin max-h-[400px] overflow-y-auto">
+          <table class="min-w-full bg-black bg-opacity-70 rounded-2xl text-purple-200">
+            <thead>
+              <tr class="border-b border-purple-700">
+                <th class="text-left py-3 px-5 font-semibold tracking-wide">ID Pagamento</th>
+                <th class="text-left py-3 px-5 font-semibold tracking-wide">Usuário</th>
+                <th class="text-left py-3 px-5 font-semibold tracking-wide">Valor</th>
+                <th class="text-left py-3 px-5 font-semibold tracking-wide">Data</th>
+                <th class="text-left py-3 px-5 font-semibold tracking-wide">Status</th>
+                <th class="text-center py-3 px-5 font-semibold tracking-wide">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="paymentsTableBody" class="divide-y divide-purple-700">
+              <!-- Pagamentos serão inseridos aqui via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <h2 class="text-3xl font-bold text-purple-400 mb-6 select-none drop-shadow-md">Adicionar Pagamento</h2>
+        <form id="addPaymentForm" class="space-y-6 max-w-md bg-black bg-opacity-70 rounded-3xl p-8 shadow-lg">
+          <div>
+            <label for="paymentUserEmail" class="block text-purple-300 font-semibold mb-2 tracking-wide">E-mail do Usuário</label>
+            <input
+              type="email"
+              id="paymentUserEmail"
+              name="paymentUserEmail"
+              placeholder="E-mail do usuário"
+              class="w-full bg-gradient-to-r from-purple-900 to-purple-800 border border-purple-700 rounded-xl p-4 text-purple-200 placeholder-purple-400 focus:outline-none focus:ring-4 focus:ring-purple-600 transition-shadow shadow-purple-700"
+              required
+              spellcheck="false"
+              autocomplete="off"
+            />
+          </div>
+
+          <div>
+            <label for="paymentAmount" class="block text-purple-300 font-semibold mb-2 tracking-wide">Valor (R$)</label>
+            <input
+              type="number"
+              id="paymentAmount"
+              name="paymentAmount"
+              placeholder="Valor do pagamento"
+              min="0.01"
+              step="0.01"
+              class="w-full bg-gradient-to-r from-purple-900 to-purple-800 border border-purple-700 rounded-xl p-4 text-purple-200 placeholder-purple-400 focus:outline-none focus:ring-4 focus:ring-purple-600 transition-shadow shadow-purple-700"
+              required
+              autocomplete="off"
+            />
+          </div>
+
+          <div>
+            <label for="paymentStatus" class="block text-purple-300 font-semibold mb-2 tracking-wide">Status do Pagamento</label>
+            <select
+              id="paymentStatus"
+              name="paymentStatus"
+              class="w-full bg-gradient-to-r from-purple-900 to-purple-800 border border-purple-700 rounded-xl p-4 text-purple-200 focus:outline-none focus:ring-4 focus:ring-purple-600 transition-shadow shadow-purple-700"
+              required
+            >
+              <option value="" disabled selected>Selecione o status</option>
+              <option value="pendente">Pendente</option>
+              <option value="aprovado">Aprovado</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-extrabold py-4 rounded-3xl transition-all shadow-lg shadow-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-500"
+          >
+            Adicionar Pagamento
+          </button>
+
+          <p id="addPaymentStatus" class="mt-4 text-center text-sm select-none"></p>
+        </form>
+      </section>
+
+      <!-- Estatísticas -->
+      <section id="tabStats" class="hidden space-y-10 max-w-4xl mx-auto">
+        <h2 class="text-3xl font-bold text-purple-400 mb-6 select-none drop-shadow-md">Estatísticas de Acesso</h2>
+        <div class="bg-black bg-opacity-70 rounded-3xl p-8 shadow-lg text-purple-200">
+          <p class="mb-4 select-none">Total de acessos ao site: <span id="totalVisits" class="font-extrabold text-purple-400">0</span></p>
+          <p class="mb-4 select-none">Último acesso: <span id="lastVisit" class="font-extrabold text-purple-400">-</span></p>
+          <p class="mb-4 select-none">Acessos por dia (últimos 7 dias):</p>
+          <ul id="visitsList" class="list-disc list-inside max-h-48 overflow-y-auto scrollbar-thin text-purple-300"></ul>
+        </div>
+      </section>
+
+      <!-- Configurações -->
+      <section id="tabSettings" class="hidden space-y-10 max-w-md mx-auto">
+        <h2 class="text-3xl font-bold text-purple-400 mb-6 select-none drop-shadow-md">Configurações</h2>
+        <p class="text-purple-300 select-none">Painel Admin protegido por senha.</p>
+        <button id="logoutBtn" class="mt-4 w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-extrabold py-4 rounded-3xl transition-all shadow-lg shadow-red-700 focus:outline-none focus:ring-4 focus:ring-red-500">
+          Sair do Painel
+        </button>
+      </section>
+    </main>
+
+    <footer class="mt-12 mb-6 text-center text-purple-400 text-sm select-none">
       &copy; 2024 Minha Loja. Todos os direitos reservados.
-    </div>
-  </footer>
+    </footer>
+  </div>
 
   <script>
-    // Variáveis globais para controle
-    let storeData = [];
-    let selectedCategoryId = null;
-    let editingCategoryId = null;
-    let editingProductId = null;
-    let modalMode = null; // 'category' ou 'product'
-    let modalAction = null; // 'add' ou 'edit'
+    // Constants
+    const ADMIN_PASSWORD = '2990298739@';
 
-    // Elementos DOM
-    const categoryListEl = document.getElementById('categoryList');
-    const productListEl = document.getElementById('productList');
-    const selectedCategoryNameEl = document.getElementById('selectedCategoryName');
-    const btnAddCategory = document.getElementById('btnAddCategory');
-    const btnAddProduct = document.getElementById('btnAddProduct');
-    const modalContainer = document.getElementById('modalContainer');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalForm = document.getElementById('modalForm');
-    const modalCloseBtn = document.getElementById('modalCloseBtn');
-    const modalCancelBtn = document.getElementById('modalCancelBtn');
-    const modalSaveBtn = document.getElementById('modalSaveBtn');
+    // Elements
+    const loginModal = document.getElementById('loginModal');
+    const loginForm = document.getElementById('loginForm');
+    const loginStatus = document.getElementById('loginStatus');
+    const adminPanel = document.getElementById('adminPanel');
 
-    // Função para salvar dados no localStorage
-    function saveData() {
-      localStorage.setItem('storeData', JSON.stringify(storeData));
-    }
+    const tabUsersBtn = document.getElementById('tabUsersBtn');
+    const tabPaymentsBtn = document.getElementById('tabPaymentsBtn');
+    const tabStatsBtn = document.getElementById('tabStatsBtn');
+    const tabSettingsBtn = document.getElementById('tabSettingsBtn');
 
-    // Função para carregar dados do localStorage
-    function loadData() {
-      const data = localStorage.getItem('storeData');
-      if (!data) {
-        // Inicializa com dados vazios
-        storeData = [];
-        saveData();
-      } else {
-        storeData = JSON.parse(data);
-      }
-    }
+    const tabUsers = document.getElementById('tabUsers');
+    const tabPayments = document.getElementById('tabPayments');
+    const tabStats = document.getElementById('tabStats');
+    const tabSettings = document.getElementById('tabSettings');
 
-    // Função para gerar ID único simples
-    function generateId(prefix = '') {
-      return prefix + Math.random().toString(36).substr(2, 9);
-    }
+    // Users
+    const usersTableBody = document.getElementById('usersTableBody');
+    const addUserForm = document.getElementById('addUserForm');
+    const addUserStatus = document.getElementById('addUserStatus');
 
-    // Função para limpar seleção de categoria
-    function clearCategorySelection() {
-      selectedCategoryId = null;
-      selectedCategoryNameEl.textContent = 'Selecione uma categoria para gerenciar os produtos.';
-      btnAddProduct.disabled = true;
-      productListEl.innerHTML = '';
-      // Remove highlight de categorias
-      const items = categoryListEl.querySelectorAll('li');
-      items.forEach((li) => li.classList.remove('bg-indigo-100'));
-    }
+    // Payments
+    const paymentsTableBody = document.getElementById('paymentsTableBody');
+    const addPaymentForm = document.getElementById('addPaymentForm');
+    const addPaymentStatus = document.getElementById('addPaymentStatus');
 
-    // Função para renderizar lista de categorias
-    function renderCategories() {
-      categoryListEl.innerHTML = '';
-      if (storeData.length === 0) {
-        const li = document.createElement('li');
-        li.className = 'p-4 text-center text-gray-500 italic';
-        li.textContent = 'Nenhuma categoria cadastrada.';
-        categoryListEl.appendChild(li);
-        clearCategorySelection();
-        return;
-      }
-      storeData.forEach((category) => {
-        const li = document.createElement('li');
-        li.className = 'flex items-center justify-between p-3 cursor-pointer hover:bg-indigo-50 transition-colors';
-        if (category.id === selectedCategoryId) {
-          li.classList.add('bg-indigo-100');
-        }
-        li.setAttribute('tabindex', '0');
-        li.setAttribute('role', 'button');
-        li.setAttribute('aria-pressed', category.id === selectedCategoryId ? 'true' : 'false');
+    // Stats
+    const totalVisitsEl = document.getElementById('totalVisits');
+    const lastVisitEl = document.getElementById('lastVisit');
+    const visitsListEl = document.getElementById('visitsList');
 
-        // Nome da categoria
-        const span = document.createElement('span');
-        span.className = 'font-medium text-gray-800 truncate';
-        span.textContent = category.name;
-
-        // Botões de ação
-        const actionsDiv = document.createElement('div');
-        actionsDiv.className = 'flex items-center space-x-2';
-
-        // Editar botão
-        const btnEdit = document.createElement('button');
-        btnEdit.className = 'text-indigo-600 hover:text-indigo-800 p-1 rounded-md';
-        btnEdit.title = 'Editar Categoria';
-        btnEdit.setAttribute('aria-label', `Editar categoria ${category.name}`);
-        btnEdit.innerHTML = '<i class="fas fa-edit"></i>';
-        btnEdit.onclick = (e) => {
-          e.stopPropagation();
-          openCategoryModal('edit', category.id);
-        };
-
-        // Excluir botão
-        const btnDelete = document.createElement('button');
-        btnDelete.className = 'text-red-600 hover:text-red-800 p-1 rounded-md';
-        btnDelete.title = 'Excluir Categoria';
-        btnDelete.setAttribute('aria-label', `Excluir categoria ${category.name}`);
-        btnDelete.innerHTML = '<i class="fas fa-trash-alt"></i>';
-        btnDelete.onclick = (e) => {
-          e.stopPropagation();
-          confirmDeleteCategory(category.id);
-        };
-
-        actionsDiv.appendChild(btnEdit);
-        actionsDiv.appendChild(btnDelete);
-
-        li.appendChild(span);
-        li.appendChild(actionsDiv);
-
-        li.onclick = () => {
-          if (selectedCategoryId !== category.id) {
-            selectedCategoryId = category.id;
-            renderCategories();
-            renderProducts();
-            btnAddProduct.disabled = false;
-            const cat = storeData.find((c) => c.id === selectedCategoryId);
-            selectedCategoryNameEl.textContent = `Produtos da categoria: ${cat.name}`;
-          }
-        };
-
-        li.onkeydown = (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            li.click();
-          }
-        };
-
-        categoryListEl.appendChild(li);
-      });
-    }
-
-    // Função para renderizar produtos da categoria selecionada
-    function renderProducts() {
-      productListEl.innerHTML = '';
-      if (!selectedCategoryId) {
-        productListEl.innerHTML = '';
-        return;
-      }
-      const category = storeData.find((c) => c.id === selectedCategoryId);
-      if (!category || category.products.length === 0) {
-        const li = document.createElement('li');
-        li.className = 'p-4 text-center text-gray-500 italic';
-        li.textContent = 'Nenhum produto cadastrado nesta categoria.';
-        productListEl.appendChild(li);
-        return;
-      }
-      category.products.forEach((product) => {
-        const li = document.createElement('li');
-        li.className = 'flex flex-col sm:flex-row sm:items-center justify-between p-3 hover:bg-indigo-50 rounded-md transition-colors';
-
-        // Info do produto
-        const infoDiv = document.createElement('div');
-        infoDiv.className = 'flex items-center space-x-4 mb-3 sm:mb-0';
-
-        const img = document.createElement('img');
-        img.src = product.image;
-        img.alt = product.name + ' - imagem do produto';
-        img.className = 'w-20 h-20 object-cover rounded-md flex-shrink-0 border border-gray-300';
-
-        const textDiv = document.createElement('div');
-        textDiv.className = 'min-w-0';
-
-        const nameP = document.createElement('p');
-        nameP.className = 'font-semibold text-gray-800 truncate';
-        nameP.textContent = product.name;
-
-        const descP = document.createElement('p');
-        descP.className = 'text-gray-600 text-sm truncate';
-        descP.textContent = product.description;
-
-        textDiv.appendChild(nameP);
-        textDiv.appendChild(descP);
-
-        infoDiv.appendChild(img);
-        infoDiv.appendChild(textDiv);
-
-        // Preço e ações
-        const actionsDiv = document.createElement('div');
-        actionsDiv.className = 'flex items-center space-x-3';
-
-        const priceP = document.createElement('p');
-        priceP.className = 'font-semibold text-indigo-600 min-w-[90px] text-right';
-        priceP.textContent = product.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-        const btnEdit = document.createElement('button');
-        btnEdit.className = 'text-indigo-600 hover:text-indigo-800 p-1 rounded-md';
-        btnEdit.title = 'Editar Produto';
-        btnEdit.setAttribute('aria-label', `Editar produto ${product.name}`);
-        btnEdit.innerHTML = '<i class="fas fa-edit"></i>';
-        btnEdit.onclick = () => openProductModal('edit', product.id);
-
-        const btnDelete = document.createElement('button');
-        btnDelete.className = 'text-red-600 hover:text-red-800 p-1 rounded-md';
-        btnDelete.title = 'Excluir Produto';
-        btnDelete.setAttribute('aria-label', `Excluir produto ${product.name}`);
-        btnDelete.innerHTML = '<i class="fas fa-trash-alt"></i>';
-        btnDelete.onclick = () => confirmDeleteProduct(product.id);
-
-        actionsDiv.appendChild(priceP);
-        actionsDiv.appendChild(btnEdit);
-        actionsDiv.appendChild(btnDelete);
-
-        li.appendChild(infoDiv);
-        li.appendChild(actionsDiv);
-
-        productListEl.appendChild(li);
-      });
-    }
-
-    // Função para abrir modal de categoria
-    function openCategoryModal(action, categoryId = null) {
-      modalMode = 'category';
-      modalAction = action;
-      editingCategoryId = categoryId;
-      modalForm.innerHTML = '';
-
-      if (action === 'add') {
-        modalTitle.textContent = 'Adicionar Categoria';
-      } else if (action === 'edit') {
-        modalTitle.textContent = 'Editar Categoria';
-      }
-
-      // Campo nome da categoria
-      const labelName = document.createElement('label');
-      labelName.className = 'block font-medium text-gray-700 mb-1';
-      labelName.setAttribute('for', 'categoryNameInput');
-      labelName.textContent = 'Nome da Categoria';
-
-      const inputName = document.createElement('input');
-      inputName.type = 'text';
-      inputName.id = 'categoryNameInput';
-      inputName.name = 'categoryName';
-      inputName.className = 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500';
-      inputName.required = true;
-      inputName.maxLength = 50;
-      inputName.autocomplete = 'off';
-
-      if (action === 'edit' && categoryId) {
-        const category = storeData.find((c) => c.id === categoryId);
-        if (category) {
-          inputName.value = category.name;
-        }
-      }
-
-      modalForm.appendChild(labelName);
-      modalForm.appendChild(inputName);
-
-      showModal();
-    }
-
-    // Função para abrir modal de produto
-    function openProductModal(action, productId = null) {
-      if (!selectedCategoryId) return;
-      modalMode = 'product';
-      modalAction = action;
-      editingProductId = productId;
-      modalForm.innerHTML = '';
-
-      if (action === 'add') {
-        modalTitle.textContent = 'Adicionar Produto';
-      } else if (action === 'edit') {
-        modalTitle.textContent = 'Editar Produto';
-      }
-
-      // Campos do produto: nome, descrição, imagem, preço
-
-      // Nome
-      const labelName = document.createElement('label');
-      labelName.className = 'block font-medium text-gray-700 mb-1';
-      labelName.setAttribute('for', 'productNameInput');
-      labelName.textContent = 'Nome do Produto';
-
-      const inputName = document.createElement('input');
-      inputName.type = 'text';
-      inputName.id = 'productNameInput';
-      inputName.name = 'productName';
-      inputName.className = 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500';
-      inputName.required = true;
-      inputName.maxLength = 100;
-      inputName.autocomplete = 'off';
-
-      // Descrição
-      const labelDesc = document.createElement('label');
-      labelDesc.className = 'block font-medium text-gray-700 mb-1 mt-4';
-      labelDesc.setAttribute('for', 'productDescInput');
-      labelDesc.textContent = 'Descrição';
-
-      const textareaDesc = document.createElement('textarea');
-      textareaDesc.id = 'productDescInput';
-      textareaDesc.name = 'productDesc';
-      textareaDesc.rows = 3;
-      textareaDesc.className = 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none';
-      textareaDesc.required = true;
-      textareaDesc.maxLength = 300;
-
-      // Imagem (URL)
-      const labelImage = document.createElement('label');
-      labelImage.className = 'block font-medium text-gray-700 mb-1 mt-4';
-      labelImage.setAttribute('for', 'productImageInput');
-      labelImage.textContent = 'URL da Imagem';
-
-      const inputImage = document.createElement('input');
-      inputImage.type = 'url';
-      inputImage.id = 'productImageInput';
-      inputImage.name = 'productImage';
-      inputImage.className = 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500';
-      inputImage.placeholder = 'https://exemplo.com/imagem.jpg';
-      inputImage.required = true;
-      inputImage.autocomplete = 'off';
-
-      // Preço
-      const labelPrice = document.createElement('label');
-      labelPrice.className = 'block font-medium text-gray-700 mb-1 mt-4';
-      labelPrice.setAttribute('for', 'productPriceInput');
-      labelPrice.textContent = 'Preço (R$)';
-
-      const inputPrice = document.createElement('input');
-      inputPrice.type = 'number';
-      inputPrice.id = 'productPriceInput';
-      inputPrice.name = 'productPrice';
-      inputPrice.className = 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500';
-      inputPrice.min = '0';
-      inputPrice.step = '0.01';
-      inputPrice.required = true;
-      inputPrice.placeholder = '0.00';
-
-      if (action === 'edit' && productId) {
-        const category = storeData.find((c) => c.id === selectedCategoryId);
-        if (category) {
-          const product = category.products.find((p) => p.id === productId);
-          if (product) {
-            inputName.value = product.name;
-            textareaDesc.value = product.description;
-            inputImage.value = product.image;
-            inputPrice.value = product.price.toFixed(2);
-          }
-        }
-      }
-
-      modalForm.appendChild(labelName);
-      modalForm.appendChild(inputName);
-      modalForm.appendChild(labelDesc);
-      modalForm.appendChild(textareaDesc);
-      modalForm.appendChild(labelImage);
-      modalForm.appendChild(inputImage);
-      modalForm.appendChild(labelPrice);
-      modalForm.appendChild(inputPrice);
-
-      showModal();
-    }
-
-    // Função para mostrar modal
-    function showModal() {
-      modalContainer.classList.remove('hidden');
-      // Focar no primeiro input
-      const firstInput = modalForm.querySelector('input, textarea');
-      if (firstInput) firstInput.focus();
-    }
-
-    // Função para fechar modal
-    function closeModal() {
-      modalContainer.classList.add('hidden');
-      modalForm.reset();
-      editingCategoryId = null;
-      editingProductId = null;
-      modalMode = null;
-      modalAction = null;
-    }
-
-    // Função para confirmar exclusão de categoria
-    function confirmDeleteCategory(categoryId) {
-      const category = storeData.find((c) => c.id === categoryId);
-      if (!category) return;
-      if (confirm(`Tem certeza que deseja excluir a categoria "${category.name}" e todos os seus produtos?`)) {
-        storeData = storeData.filter((c) => c.id !== categoryId);
-        if (selectedCategoryId === categoryId) {
-          clearCategorySelection();
-        }
-        saveData();
-        renderCategories();
-        renderProducts();
-      }
-    }
-
-    // Função para confirmar exclusão de produto
-    function confirmDeleteProduct(productId) {
-      if (!selectedCategoryId) return;
-      const category = storeData.find((c) => c.id === selectedCategoryId);
-      if (!category) return;
-      const product = category.products.find((p) => p.id === productId);
-      if (!product) return;
-      if (confirm(`Tem certeza que deseja excluir o produto "${product.name}"?`)) {
-        category.products = category.products.filter((p) => p.id !== productId);
-        saveData();
-        renderProducts();
-      }
-    }
-
-    // Função para validar URL de imagem (simples)
-    function isValidImageUrl(url) {
-      return /^https?:\/\/.+\.(jpg|jpeg|png|webp|avif|gif|svg)$/i.test(url.trim());
-    }
-
-    // Evento para abrir modal adicionar categoria
-    btnAddCategory.addEventListener('click', () => {
-      openCategoryModal('add');
-    });
-
-    // Evento para abrir modal adicionar produto
-    btnAddProduct.addEventListener('click', () => {
-      if (!selectedCategoryId) return;
-      openProductModal('add');
-    });
-
-    // Evento fechar modal
-    modalCloseBtn.addEventListener('click', closeModal);
-    modalCancelBtn.addEventListener('click', closeModal);
-
-    // Evento submit do formulário modal
-    modalForm.addEventListener('submit', (e) => {
+    // Login form submit
+    loginForm.addEventListener('submit', e => {
       e.preventDefault();
+      loginStatus.textContent = '';
+      const passwordInput = loginForm.adminPasswordInput.value.trim();
 
-      if (modalMode === 'category') {
-        const nameInput = modalForm.querySelector('input[name="categoryName"]');
-        const name = nameInput.value.trim();
-
-        if (!name) {
-          alert('O nome da categoria é obrigatório.');
-          nameInput.focus();
-          return;
-        }
-
-        // Verifica duplicidade de nome (case insensitive)
-        const nameExists = storeData.some((c) => c.name.toLowerCase() === name.toLowerCase() && c.id !== editingCategoryId);
-        if (nameExists) {
-          alert('Já existe uma categoria com esse nome.');
-          nameInput.focus();
-          return;
-        }
-
-        if (modalAction === 'add') {
-          const newCategory = {
-            id: generateId('cat'),
-            name,
-            products: [],
-          };
-          storeData.push(newCategory);
-          selectedCategoryId = newCategory.id;
-        } else if (modalAction === 'edit' && editingCategoryId) {
-          const category = storeData.find((c) => c.id === editingCategoryId);
-          if (category) {
-            category.name = name;
-            // Atualiza nome da categoria selecionada se for a mesma
-            if (selectedCategoryId === editingCategoryId) {
-              selectedCategoryNameEl.textContent = `Produtos da categoria: ${name}`;
-            }
-          }
-        }
-
-        saveData();
-        renderCategories();
-        renderProducts();
-        closeModal();
-      } else if (modalMode === 'product') {
-        const nameInput = modalForm.querySelector('input[name="productName"]');
-        const descInput = modalForm.querySelector('textarea[name="productDesc"]');
-        const imageInput = modalForm.querySelector('input[name="productImage"]');
-        const priceInput = modalForm.querySelector('input[name="productPrice"]');
-
-        const name = nameInput.value.trim();
-        const description = descInput.value.trim();
-        const image = imageInput.value.trim();
-        const price = parseFloat(priceInput.value);
-
-        if (!name) {
-          alert('O nome do produto é obrigatório.');
-          nameInput.focus();
-          return;
-        }
-        if (!description) {
-          alert('A descrição do produto é obrigatória.');
-          descInput.focus();
-          return;
-        }
-        if (!image) {
-          alert('A URL da imagem é obrigatória.');
-          imageInput.focus();
-          return;
-        }
-        if (!isValidImageUrl(image)) {
-          alert('A URL da imagem deve ser válida e terminar com uma extensão de imagem (jpg, png, gif, etc).');
-          imageInput.focus();
-          return;
-        }
-        if (isNaN(price) || price < 0) {
-          alert('O preço deve ser um número válido maior ou igual a zero.');
-          priceInput.focus();
-          return;
-        }
-
-        const category = storeData.find((c) => c.id === selectedCategoryId);
-        if (!category) {
-          alert('Categoria não encontrada.');
-          closeModal();
-          return;
-        }
-
-        if (modalAction === 'add') {
-          const newProduct = {
-            id: generateId('prod'),
-            name,
-            description,
-            image,
-            price,
-          };
-          category.products.push(newProduct);
-        } else if (modalAction === 'edit' && editingProductId) {
-          const product = category.products.find((p) => p.id === editingProductId);
-          if (product) {
-            product.name = name;
-            product.description = description;
-            product.image = image;
-            product.price = price;
-          }
-        }
-
-        saveData();
-        renderProducts();
-        closeModal();
+      if(passwordInput === ADMIN_PASSWORD) {
+        loginModal.classList.add('hidden');
+        adminPanel.classList.remove('hidden');
+        loginForm.reset();
+        initializeAdminPanel();
+      } else {
+        loginStatus.textContent = 'Senha incorreta. Tente novamente.';
       }
     });
 
-    // Inicialização da página
-    document.addEventListener('DOMContentLoaded', () => {
-      loadData();
-      renderCategories();
-      clearCategorySelection();
+    // Initialize admin panel after login
+    function initializeAdminPanel() {
+      renderUsers();
+      renderPayments();
+      renderStats();
+      showTab('users');
+    }
+
+    // Tab switching
+    function showTab(tabName) {
+      // Remove active styles from all buttons
+      [tabUsersBtn, tabPaymentsBtn, tabStatsBtn, tabSettingsBtn].forEach(btn => {
+        btn.classList.remove('text-purple-400', 'font-extrabold');
+        btn.classList.add('text-purple-300');
+      });
+
+      // Hide all tabs
+      [tabUsers, tabPayments, tabStats, tabSettings].forEach(tab => tab.classList.add('hidden'));
+
+      // Show selected tab and highlight button
+      switch(tabName) {
+        case 'users':
+          tabUsers.classList.remove('hidden');
+          tabUsersBtn.classList.add('text-purple-400', 'font-extrabold');
+          tabUsersBtn.classList.remove('text-purple-300');
+          break;
+        case 'payments':
+          tabPayments.classList.remove('hidden');
+          tabPaymentsBtn.classList.add('text-purple-400', 'font-extrabold');
+          tabPaymentsBtn.classList.remove('text-purple-300');
+          break;
+        case 'stats':
+          tabStats.classList.remove('hidden');
+          tabStatsBtn.classList.add('text-purple-400', 'font-extrabold');
+          tabStatsBtn.classList.remove('text-purple-300');
+          break;
+        case 'settings':
+          tabSettings.classList.remove('hidden');
+          tabSettingsBtn.classList.add('text-purple-400', 'font-extrabold');
+          tabSettingsBtn.classList.remove('text-purple-300');
+          break;
+      }
+    }
+
+    tabUsersBtn.addEventListener('click', () => showTab('users'));
+    tabPaymentsBtn.addEventListener('click', () => showTab('payments'));
+    tabStatsBtn.addEventListener('click', () => showTab('stats'));
+    tabSettingsBtn.addEventListener('click', () => showTab('settings'));
+
+    // Users management
+    function loadUsers() {
+      return JSON.parse(localStorage.getItem('users')) || [];
+    }
+    function saveUsers(users) {
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+    function renderUsers() {
+      const users = loadUsers();
+      usersTableBody.innerHTML = '';
+
+      if(users.length === 0) {
+        usersTableBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="text-center py-6 text-purple-500 select-none">Nenhum usuário cadastrado.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      users.forEach(user => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-purple-900 transition-colors';
+
+        const createdAtDate = new Date(user.createdAt);
+        const formattedDate = createdAtDate.toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+        tr.innerHTML = `
+          <td class="py-4 px-5 font-mono text-sm select-text">${user.id}</td>
+          <td class="py-4 px-5 font-semibold select-text">${user.fullName}</td>
+          <td class="py-4 px-5 select-text break-all">${user.email}</td>
+          <td class="py-4 px-5 select-text">${formattedDate}</td>
+          <td class="py-4 px-5 text-center">
+            <button aria-label="Excluir usuário ${user.fullName}" title="Excluir usuário" class="text-red-500 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 rounded transition delete-user-btn">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        `;
+
+        tr.querySelector('.delete-user-btn').addEventListener('click', () => {
+          if(confirm(`Tem certeza que deseja excluir o usuário "${user.fullName}"?`)) {
+            deleteUser(user.id);
+          }
+        });
+
+        usersTableBody.appendChild(tr);
+      });
+    }
+    function deleteUser(userId) {
+      let users = loadUsers();
+      users = users.filter(u => u.id !== userId);
+      saveUsers(users);
+      renderUsers();
+    }
+    function emailExists(email) {
+      let users = loadUsers();
+      return users.some(u => u.email.toLowerCase() === email.toLowerCase());
+    }
+    addUserForm.addEventListener('submit', e => {
+      e.preventDefault();
+      addUserStatus.textContent = '';
+      addUserStatus.className = 'mt-4 text-center text-sm select-none';
+
+      const fullName = addUserForm.adminFullName.value.trim();
+      const email = addUserForm.adminEmail.value.trim();
+      const password = addUserForm.adminPassword.value;
+
+      if (fullName.length < 3) {
+        addUserStatus.textContent = 'O nome completo deve ter pelo menos 3 caracteres.';
+        addUserStatus.classList.add('text-red-500');
+        addUserForm.adminFullName.focus();
+        return;
+      }
+
+      if (!isValidEmail(email)) {
+        addUserStatus.textContent = 'Por favor, informe um e-mail válido.';
+        addUserStatus.classList.add('text-red-500');
+        addUserForm.adminEmail.focus();
+        return;
+      }
+
+      if (emailExists(email)) {
+        addUserStatus.textContent = 'Este e-mail já está cadastrado.';
+        addUserStatus.classList.add('text-red-500');
+        addUserForm.adminEmail.focus();
+        return;
+      }
+
+      if (password.length < 8) {
+        addUserStatus.textContent = 'A senha deve ter pelo menos 8 caracteres.';
+        addUserStatus.classList.add('text-red-500');
+        addUserForm.adminPassword.focus();
+        return;
+      }
+
+      const newUser = {
+        id: 'user_' + Math.random().toString(36).substr(2, 9),
+        fullName,
+        email,
+        password, // Em app real, nunca salvar senha em texto puro
+        createdAt: new Date().toISOString(),
+      };
+
+      const users = loadUsers();
+      users.push(newUser);
+      saveUsers(users);
+
+      addUserStatus.textContent = 'Usuário adicionado com sucesso!';
+      addUserStatus.classList.remove('text-red-500');
+      addUserStatus.classList.add('text-green-400');
+
+      addUserForm.reset();
+      renderUsers();
     });
+
+    // Payments management
+    function loadPayments() {
+      return JSON.parse(localStorage.getItem('payments')) || [];
+    }
+    function savePayments(payments) {
+      localStorage.setItem('payments', JSON.stringify(payments));
+    }
+    function renderPayments() {
+      const payments = loadPayments();
+      paymentsTableBody.innerHTML = '';
+
+      if(payments.length === 0) {
+        paymentsTableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="text-center py-6 text-purple-500 select-none">Nenhum pagamento registrado.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      payments.forEach(payment => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-purple-900 transition-colors';
+
+        const createdAtDate = new Date(payment.createdAt);
+        const formattedDate = createdAtDate.toLocaleDateString('pt-BR', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+        // Find user name by email
+        const users = loadUsers();
+        const user = users.find(u => u.email.toLowerCase() === payment.userEmail.toLowerCase());
+        const userName = user ? user.fullName : '(Usuário não encontrado)';
+
+        // Status badge color
+        let statusColor = 'text-yellow-400';
+        if(payment.status === 'aprovado') statusColor = 'text-green-400';
+        else if(payment.status === 'cancelado') statusColor = 'text-red-500';
+
+        tr.innerHTML = `
+          <td class="py-4 px-5 font-mono text-sm select-text">${payment.id}</td>
+          <td class="py-4 px-5 select-text break-all" title="${payment.userEmail}">${userName}</td>
+          <td class="py-4 px-5 select-text">R$ ${Number(payment.amount).toFixed(2)}</td>
+          <td class="py-4 px-5 select-text">${formattedDate}</td>
+          <td class="py-4 px-5 select-text font-semibold ${statusColor} capitalize">${payment.status}</td>
+          <td class="py-4 px-5 text-center">
+            <select aria-label="Alterar status do pagamento ${payment.id}" class="bg-black bg-opacity-70 border border-purple-700 rounded-xl p-2 text-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-600 transition-shadow shadow-purple-700 payment-status-select">
+              <option value="pendente" ${payment.status === 'pendente' ? 'selected' : ''}>Pendente</option>
+              <option value="aprovado" ${payment.status === 'aprovado' ? 'selected' : ''}>Aprovado</option>
+              <option value="cancelado" ${payment.status === 'cancelado' ? 'selected' : ''}>Cancelado</option>
+            </select>
+            <button aria-label="Excluir pagamento ${payment.id}" title="Excluir pagamento" class="ml-2 text-red-500 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 rounded transition delete-payment-btn">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        `;
+
+        // Change status event
+        tr.querySelector('.payment-status-select').addEventListener('change', (e) => {
+          updatePaymentStatus(payment.id, e.target.value);
+        });
+
+        // Delete payment event
+        tr.querySelector('.delete-payment-btn').addEventListener('click', () => {
+          if(confirm(`Tem certeza que deseja excluir o pagamento "${payment.id}"?`)) {
+            deletePayment(payment.id);
+          }
+        });
+
+        paymentsTableBody.appendChild(tr);
+      });
+    }
+    function updatePaymentStatus(paymentId, newStatus) {
+      let payments = loadPayments();
+      const idx = payments.findIndex(p => p.id === paymentId);
+      if(idx !== -1) {
+        payments[idx].status = newStatus;
+        savePayments(payments);
+        renderPayments();
+      }
+    }
+    function deletePayment(paymentId) {
+      let payments = loadPayments();
+      payments = payments.filter(p => p.id !== paymentId);
+      savePayments(payments);
+      renderPayments();
+    }
+    addPaymentForm.addEventListener('submit', e => {
+      e.preventDefault();
+      addPaymentStatus.textContent = '';
+      addPaymentStatus.className = 'mt-4 text-center text-sm select-none';
+
+      const userEmail = addPaymentForm.paymentUserEmail.value.trim();
+      const amount = parseFloat(addPaymentForm.paymentAmount.value);
+      const status = addPaymentForm.paymentStatus.value;
+
+      if (!isValidEmail(userEmail)) {
+        addPaymentStatus.textContent = 'Por favor, informe um e-mail válido do usuário.';
+        addPaymentStatus.classList.add('text-red-500');
+        addPaymentForm.paymentUserEmail.focus();
+        return;
+      }
+
+      if (isNaN(amount) || amount <= 0) {
+        addPaymentStatus.textContent = 'Informe um valor válido maior que zero.';
+        addPaymentStatus.classList.add('text-red-500');
+        addPaymentForm.paymentAmount.focus();
+        return;
+      }
+
+      if (!['pendente', 'aprovado', 'cancelado'].includes(status)) {
+        addPaymentStatus.textContent = 'Selecione um status válido para o pagamento.';
+        addPaymentStatus.classList.add('text-red-500');
+        addPaymentForm.paymentStatus.focus();
+        return;
+      }
+
+      // Check if user exists
+      const users = loadUsers();
+      if(!users.some(u => u.email.toLowerCase() === userEmail.toLowerCase())) {
+        addPaymentStatus.textContent = 'Usuário com este e-mail não encontrado.';
+        addPaymentStatus.classList.add('text-red-500');
+        addPaymentForm.paymentUserEmail.focus();
+        return;
+      }
+
+      const newPayment = {
+        id: 'pay_' + Math.random().toString(36).substr(2, 9),
+        userEmail,
+        amount,
+        status,
+        createdAt: new Date().toISOString(),
+      };
+
+      const payments = loadPayments();
+      payments.push(newPayment);
+      savePayments(payments);
+
+      addPaymentStatus.textContent = 'Pagamento adicionado com sucesso!';
+      addPaymentStatus.classList.remove('text-red-500');
+      addPaymentStatus.classList.add('text-green-400');
+
+      addPaymentForm.reset();
+      renderPayments();
+    });
+
+    // Estatísticas de acesso
+    // Usaremos localStorage para armazenar visitas e datas
+    function recordVisit() {
+      const visitsRaw = localStorage.getItem('siteVisits');
+      let visits = visitsRaw ? JSON.parse(visitsRaw) : [];
+
+      const today = new Date();
+      const todayStr = today.toISOString().slice(0,10); // YYYY-MM-DD
+
+      // Increment count for today or add new
+      const todayEntry = visits.find(v => v.date === todayStr);
+      if(todayEntry) {
+        todayEntry.count++;
+      } else {
+        visits.push({ date: todayStr, count: 1 });
+      }
+
+      // Save updated visits
+      localStorage.setItem('siteVisits', JSON.stringify(visits));
+
+      // Save last visit date/time
+      localStorage.setItem('lastVisit', new Date().toISOString());
+    }
+
+    function renderStats() {
+      const visitsRaw = localStorage.getItem('siteVisits');
+      const visits = visitsRaw ? JSON.parse(visitsRaw) : [];
+      const totalVisits = visits.reduce((acc, v) => acc + v.count, 0);
+      totalVisitsEl.textContent = totalVisits;
+
+      const lastVisitRaw = localStorage.getItem('lastVisit');
+      if(lastVisitRaw) {
+        const lastDate = new Date(lastVisitRaw);
+        lastVisitEl.textContent = lastDate.toLocaleString('pt-BR', {
+          day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+      } else {
+        lastVisitEl.textContent = '-';
+      }
+
+      // Show last 7 days visits
+      visitsListEl.innerHTML = '';
+      const today = new Date();
+      for(let i=6; i>=0; i--) {
+        const day = new Date(today);
+        day.setDate(today.getDate() - i);
+        const dayStr = day.toISOString().slice(0,10);
+        const visitEntry = visits.find(v => v.date === dayStr);
+        const count = visitEntry ? visitEntry.count : 0;
+        const dayLabel = day.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
+        const li = document.createElement('li');
+        li.textContent = `${dayLabel}: ${count} acesso${count !== 1 ? 's' : ''}`;
+        visitsListEl.appendChild(li);
+      }
+    }
+
+    // Logout button
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      if(confirm('Deseja realmente sair do painel admin?')) {
+        adminPanel.classList.add('hidden');
+        loginModal.classList.remove('hidden');
+      }
+    });
+
+    // Simple email validation
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    // Record visit on page load (simulate site visit)
+    recordVisit();
+
   </script>
 </body>
 </html>
