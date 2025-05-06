@@ -1,514 +1,639 @@
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>FIDEPROTA STORE Admin</title>
+  <title>Painel Administrativo - Minha Loja</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
   />
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
     rel="stylesheet"
   />
   <style>
     body {
-      font-family: "Inter", sans-serif;
-      background-color: #f9fafb;
+      font-family: 'Inter', sans-serif;
     }
-    /* Scrollbar hide for overflow-x */
-    .scrollbar-hide::-webkit-scrollbar {
-      display: none;
+    /* Scrollbar custom for product list */
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
     }
-    .scrollbar-hide {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-    dialog::backdrop {
-      background: rgba(0, 0, 0, 0.4);
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background-color: rgba(99, 102, 241, 0.6);
+      border-radius: 3px;
     }
   </style>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: {
-              DEFAULT: '#6b21a8', // purple-700
-              dark: '#581c87', // purple-800
-              light: '#a78bfa', // purple-400
-            },
-          },
-        },
-      },
-    };
-  </script>
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
 </head>
-<body class="min-h-screen flex flex-col">
-  <!-- Login Screen -->
-  <div id="login-screen" class="fixed inset-0 bg-white flex flex-col justify-center items-center p-6 z-50">
-    <h1 class="text-2xl font-bold mb-6 text-primary">Admin Login</h1>
-    <form id="login-form" class="w-full max-w-xs bg-white p-6 rounded-lg shadow-md">
-      <label for="admin-password" class="block text-sm font-semibold mb-2 text-primary">Senha de Admin</label>
-      <input
-        id="admin-password"
-        type="password"
-        placeholder="Digite a senha"
-        class="w-full px-3 py-2 border border-primary rounded-md focus:outline-none focus:ring-2 focus:ring-primary mb-4"
-        required
-      />
-      <button
-        type="submit"
-        class="w-full bg-primary text-white py-2 rounded-md font-semibold hover:bg-primary-dark transition"
-      >
-        Entrar
-      </button>
-      <p id="login-error" class="text-red-600 text-xs mt-2 hidden">Senha incorreta. Tente novamente.</p>
-    </form>
-  </div>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <header class="bg-white shadow-md sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+      <h1 class="text-2xl font-semibold text-indigo-600">Painel Administrativo</h1>
+      <nav>
+        <a href="index.html" class="text-gray-700 hover:text-indigo-600 font-medium px-3 py-2 rounded-md">Loja</a>
+        <a href="admin.html" class="text-indigo-600 font-semibold px-3 py-2 rounded-md">Painel Admin</a>
+      </nav>
+    </div>
+  </header>
 
-  <!-- Admin Panel -->
-  <div id="admin-panel" class="hidden flex-grow max-w-[1280px] mx-auto p-6 flex flex-col space-y-6">
-    <header class="flex justify-between items-center border-b border-gray-300 pb-4">
-      <h1 class="text-3xl font-bold text-primary">Painel Admin FIDEPROTA STORE</h1>
-      <button
-        id="logout-btn"
-        class="text-sm text-red-600 border border-red-600 px-3 py-1 rounded hover:bg-red-600 hover:text-white transition"
-        type="button"
-      >
-        Sair
-      </button>
-    </header>
+  <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h2 class="text-3xl font-semibold text-gray-800 mb-8 text-center">Gerenciamento de Categorias e Produtos</h2>
 
-    <section aria-label="Gerenciar Categorias" class="bg-white rounded-lg shadow p-6">
-      <h2 class="text-xl font-semibold mb-4 text-primary">Categorias</h2>
-      <form id="add-category-form" class="flex space-x-3 mb-6">
-        <input
-          type="text"
-          id="new-category-name"
-          placeholder="Nova categoria"
-          class="flex-grow border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-          required
-        />
-        <button
-          type="submit"
-          class="bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark transition font-semibold"
-        >
-          Adicionar
-        </button>
-      </form>
-      <ul id="categories-list" class="space-y-2 max-h-48 overflow-y-auto border border-gray-200 rounded p-3">
-        <!-- Categories will be listed here -->
-      </ul>
-    </section>
+    <div class="flex flex-col md:flex-row gap-8">
+      <!-- CATEGORIAS -->
+      <section class="md:w-1/3 bg-white rounded-lg shadow-md p-6 flex flex-col">
+        <h3 class="text-xl font-semibold text-indigo-700 mb-4 flex items-center justify-between">
+          Categorias
+          <button id="btnAddCategory" class="text-indigo-600 hover:text-indigo-800" title="Adicionar Categoria" aria-label="Adicionar Categoria">
+            <i class="fas fa-plus-circle fa-lg"></i>
+          </button>
+        </h3>
+        <ul id="categoryList" class="flex-grow overflow-y-auto scrollbar-thin border border-gray-200 rounded-md divide-y divide-gray-200">
+          <!-- Lista de categorias será inserida aqui -->
+        </ul>
+      </section>
 
-    <section aria-label="Gerenciar Produtos" class="bg-white rounded-lg shadow p-6 flex flex-col">
-      <h2 class="text-xl font-semibold mb-4 text-primary">Produtos</h2>
-      <form id="add-product-form" class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
-        <input
-          type="text"
-          id="product-name"
-          placeholder="Nome do produto"
-          class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-          required
-        />
-        <input
-          type="url"
-          id="product-image"
-          placeholder="URL da imagem"
-          class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-          required
-        />
-        <select
-          id="product-category"
-          class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-          required
-        >
-          <option value="" disabled selected>Selecione a categoria</option>
-        </select>
-        <input
-          type="number"
-          id="product-price"
-          placeholder="Preço (R$)"
-          min="0"
-          step="0.01"
-          class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-          required
-        />
-        <input
-          type="number"
-          id="product-stock"
-          placeholder="Estoque"
-          min="0"
-          step="1"
-          class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-          required
-        />
-        <button
-          type="submit"
-          class="bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark transition font-semibold"
-        >
-          Adicionar Produto
-        </button>
-      </form>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse border border-gray-300">
-          <thead class="bg-primary-light text-primary-dark">
-            <tr>
-              <th class="border border-gray-300 px-3 py-2">Imagem</th>
-              <th class="border border-gray-300 px-3 py-2">Nome</th>
-              <th class="border border-gray-300 px-3 py-2">Categoria</th>
-              <th class="border border-gray-300 px-3 py-2">Preço (R$)</th>
-              <th class="border border-gray-300 px-3 py-2">Estoque</th>
-              <th class="border border-gray-300 px-3 py-2 w-24">Ações</th>
-            </tr>
-          </thead>
-          <tbody id="products-list" class="divide-y divide-gray-200">
-            <!-- Products will be listed here -->
-          </tbody>
-        </table>
+      <!-- PRODUTOS -->
+      <section class="md:w-2/3 bg-white rounded-lg shadow-md p-6 flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-xl font-semibold text-indigo-700">Produtos</h3>
+          <button id="btnAddProduct" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-1.5 px-4 rounded-md disabled:opacity-50" disabled>
+            <i class="fas fa-plus mr-2"></i>Adicionar Produto
+          </button>
+        </div>
+        <p id="selectedCategoryName" class="text-gray-600 mb-4 italic">Selecione uma categoria para gerenciar os produtos.</p>
+        <ul id="productList" class="flex-grow overflow-y-auto scrollbar-thin border border-gray-200 rounded-md divide-y divide-gray-200">
+          <!-- Lista de produtos será inserida aqui -->
+        </ul>
+      </section>
+    </div>
+
+    <!-- FORMULÁRIO MODAL -->
+    <div id="modalContainer" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+      <div class="bg-white rounded-lg max-w-lg w-full p-6 relative shadow-lg max-h-[90vh] overflow-y-auto">
+        <button id="modalCloseBtn" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold" aria-label="Fechar modal">&times;</button>
+        <h3 id="modalTitle" class="text-2xl font-semibold text-gray-800 mb-6"></h3>
+        <form id="modalForm" class="space-y-4" novalidate>
+          <!-- Campos do formulário serão inseridos dinamicamente -->
+        </form>
+        <div class="flex justify-end mt-6 space-x-3">
+          <button id="modalCancelBtn" type="button" class="px-4 py-2 rounded-md border border-gray-300 hover:border-gray-400 text-gray-700 font-semibold">Cancelar</button>
+          <button id="modalSaveBtn" type="submit" class="px-5 py-2 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">Salvar</button>
+        </div>
       </div>
-    </section>
-  </div>
+    </div>
+  </main>
+
+  <footer class="bg-white border-t border-gray-200 py-6 mt-12">
+    <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
+      &copy; 2024 Minha Loja. Todos os direitos reservados.
+    </div>
+  </footer>
 
   <script>
-    // Firebase config and initialization
-    const firebaseConfig = {
-      apiKey: "AIzaSyB9P_b9q7JX-WUp1hm2IE6tc9ZwL1JrJRw",
-      authDomain: "fideprotastore.firebaseapp.com",
-      projectId: "fideprotastore",
-      storageBucket: "fideprotastore.appspot.com",
-      messagingSenderId: "528905688496",
-      appId: "1:528905688496:web:69ba0c819d531d08263275",
-      measurementId: "G-XFGP4M7KVN"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
+    // Variáveis globais para controle
+    let storeData = [];
+    let selectedCategoryId = null;
+    let editingCategoryId = null;
+    let editingProductId = null;
+    let modalMode = null; // 'category' ou 'product'
+    let modalAction = null; // 'add' ou 'edit'
 
-    // Admin password (for demo only, use Firebase Auth in production)
-    const ADMIN_PASSWORD = "2990298739@";
+    // Elementos DOM
+    const categoryListEl = document.getElementById('categoryList');
+    const productListEl = document.getElementById('productList');
+    const selectedCategoryNameEl = document.getElementById('selectedCategoryName');
+    const btnAddCategory = document.getElementById('btnAddCategory');
+    const btnAddProduct = document.getElementById('btnAddProduct');
+    const modalContainer = document.getElementById('modalContainer');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalForm = document.getElementById('modalForm');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+    const modalCancelBtn = document.getElementById('modalCancelBtn');
+    const modalSaveBtn = document.getElementById('modalSaveBtn');
 
-    // Elements
-    const loginScreen = document.getElementById("login-screen");
-    const adminPanel = document.getElementById("admin-panel");
-    const loginForm = document.getElementById("login-form");
-    const loginError = document.getElementById("login-error");
-    const logoutBtn = document.getElementById("logout-btn");
+    // Função para salvar dados no localStorage
+    function saveData() {
+      localStorage.setItem('storeData', JSON.stringify(storeData));
+    }
 
-    const addCategoryForm = document.getElementById("add-category-form");
-    const newCategoryNameInput = document.getElementById("new-category-name");
-    const categoriesList = document.getElementById("categories-list");
-    const productCategorySelect = document.getElementById("product-category");
-
-    const addProductForm = document.getElementById("add-product-form");
-    const productNameInput = document.getElementById("product-name");
-    const productImageInput = document.getElementById("product-image");
-    const productPriceInput = document.getElementById("product-price");
-    const productStockInput = document.getElementById("product-stock");
-    const productsList = document.getElementById("products-list");
-
-    let categories = [];
-    let products = [];
-
-    // Check login state
-    function checkLogin() {
-      const loggedIn = sessionStorage.getItem("fideprota_admin_logged_in");
-      if (loggedIn === "true") {
-        loginScreen.classList.add("hidden");
-        adminPanel.classList.remove("hidden");
-        loadData();
+    // Função para carregar dados do localStorage
+    function loadData() {
+      const data = localStorage.getItem('storeData');
+      if (!data) {
+        // Inicializa com dados vazios
+        storeData = [];
+        saveData();
       } else {
-        loginScreen.classList.remove("hidden");
-        adminPanel.classList.add("hidden");
+        storeData = JSON.parse(data);
       }
     }
 
-    // Load categories and products from Firestore
-    async function loadData() {
-      try {
-        const catSnapshot = await db.collection("categories").orderBy("name").get();
-        categories = catSnapshot.docs.map(doc => doc.data().name);
-        renderCategories();
-        populateCategorySelect();
-
-        const prodSnapshot = await db.collection("products").orderBy("name").get();
-        products = prodSnapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            name: data.name,
-            image: data.image,
-            category: data.category,
-            price: data.price,
-            stock: data.stock,
-          };
-        });
-        renderProducts();
-      } catch (error) {
-        console.error("Erro ao carregar dados do Firebase:", error);
-      }
+    // Função para gerar ID único simples
+    function generateId(prefix = '') {
+      return prefix + Math.random().toString(36).substr(2, 9);
     }
 
-    // Render categories list
+    // Função para limpar seleção de categoria
+    function clearCategorySelection() {
+      selectedCategoryId = null;
+      selectedCategoryNameEl.textContent = 'Selecione uma categoria para gerenciar os produtos.';
+      btnAddProduct.disabled = true;
+      productListEl.innerHTML = '';
+      // Remove highlight de categorias
+      const items = categoryListEl.querySelectorAll('li');
+      items.forEach((li) => li.classList.remove('bg-indigo-100'));
+    }
+
+    // Função para renderizar lista de categorias
     function renderCategories() {
-      categoriesList.innerHTML = "";
-      categories.forEach((cat, index) => {
-        const li = document.createElement("li");
-        li.className = "flex justify-between items-center bg-gray-50 rounded px-3 py-1";
+      categoryListEl.innerHTML = '';
+      if (storeData.length === 0) {
+        const li = document.createElement('li');
+        li.className = 'p-4 text-center text-gray-500 italic';
+        li.textContent = 'Nenhuma categoria cadastrada.';
+        categoryListEl.appendChild(li);
+        clearCategorySelection();
+        return;
+      }
+      storeData.forEach((category) => {
+        const li = document.createElement('li');
+        li.className = 'flex items-center justify-between p-3 cursor-pointer hover:bg-indigo-50 transition-colors';
+        if (category.id === selectedCategoryId) {
+          li.classList.add('bg-indigo-100');
+        }
+        li.setAttribute('tabindex', '0');
+        li.setAttribute('role', 'button');
+        li.setAttribute('aria-pressed', category.id === selectedCategoryId ? 'true' : 'false');
 
-        const span = document.createElement("span");
-        span.textContent = cat;
-        span.className = "truncate";
+        // Nome da categoria
+        const span = document.createElement('span');
+        span.className = 'font-medium text-gray-800 truncate';
+        span.textContent = category.name;
 
-        const editBtn = document.createElement("button");
-        editBtn.className = "text-primary hover:text-primary-dark text-xs mr-2";
-        editBtn.textContent = "Editar";
-        editBtn.type = "button";
-        editBtn.onclick = () => {
-          const newName = prompt("Editar nome da categoria:", cat);
-          if (newName && newName.trim() !== "") {
-            updateCategory(categories[index], newName.trim());
-          }
+        // Botões de ação
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'flex items-center space-x-2';
+
+        // Editar botão
+        const btnEdit = document.createElement('button');
+        btnEdit.className = 'text-indigo-600 hover:text-indigo-800 p-1 rounded-md';
+        btnEdit.title = 'Editar Categoria';
+        btnEdit.setAttribute('aria-label', `Editar categoria ${category.name}`);
+        btnEdit.innerHTML = '<i class="fas fa-edit"></i>';
+        btnEdit.onclick = (e) => {
+          e.stopPropagation();
+          openCategoryModal('edit', category.id);
         };
 
-        const delBtn = document.createElement("button");
-        delBtn.className = "text-red-600 hover:text-red-800 text-xs";
-        delBtn.textContent = "Excluir";
-        delBtn.type = "button";
-        delBtn.onclick = () => {
-          if (confirm(`Tem certeza que deseja excluir a categoria "${cat}"?`)) {
-            deleteCategory(categories[index]);
-          }
+        // Excluir botão
+        const btnDelete = document.createElement('button');
+        btnDelete.className = 'text-red-600 hover:text-red-800 p-1 rounded-md';
+        btnDelete.title = 'Excluir Categoria';
+        btnDelete.setAttribute('aria-label', `Excluir categoria ${category.name}`);
+        btnDelete.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        btnDelete.onclick = (e) => {
+          e.stopPropagation();
+          confirmDeleteCategory(category.id);
         };
+
+        actionsDiv.appendChild(btnEdit);
+        actionsDiv.appendChild(btnDelete);
 
         li.appendChild(span);
-        li.appendChild(editBtn);
-        li.appendChild(delBtn);
-        categoriesList.appendChild(li);
-      });
-    }
+        li.appendChild(actionsDiv);
 
-    // Populate category select in product form
-    function populateCategorySelect() {
-      productCategorySelect.innerHTML = '<option value="" disabled selected>Selecione a categoria</option>';
-      categories.forEach(cat => {
-        const option = document.createElement("option");
-        option.value = cat;
-        option.textContent = cat;
-        productCategorySelect.appendChild(option);
-      });
-    }
-
-    // Render products list
-    function renderProducts() {
-      productsList.innerHTML = "";
-      products.forEach(product => {
-        const tr = document.createElement("tr");
-
-        const tdImg = document.createElement("td");
-        tdImg.className = "border border-gray-300 px-3 py-2";
-        const img = document.createElement("img");
-        img.src = product.image;
-        img.alt = product.name;
-        img.className = "w-16 h-16 object-cover rounded";
-        tdImg.appendChild(img);
-
-        const tdName = document.createElement("td");
-        tdName.className = "border border-gray-300 px-3 py-2";
-        tdName.textContent = product.name;
-
-        const tdCat = document.createElement("td");
-        tdCat.className = "border border-gray-300 px-3 py-2";
-        tdCat.textContent = product.category;
-
-        const tdPrice = document.createElement("td");
-        tdPrice.className = "border border-gray-300 px-3 py-2";
-        tdPrice.textContent = product.price.toFixed(2);
-
-        const tdStock = document.createElement("td");
-        tdStock.className = "border border-gray-300 px-3 py-2";
-        tdStock.textContent = product.stock;
-
-        const tdActions = document.createElement("td");
-        tdActions.className = "border border-gray-300 px-3 py-2 space-x-2";
-
-        const editBtn = document.createElement("button");
-        editBtn.className = "text-primary hover:text-primary-dark text-xs font-semibold";
-        editBtn.textContent = "Editar";
-        editBtn.type = "button";
-        editBtn.onclick = () => {
-          editProductDialog(product);
-        };
-
-        const delBtn = document.createElement("button");
-        delBtn.className = "text-red-600 hover:text-red-800 text-xs font-semibold";
-        delBtn.textContent = "Excluir";
-        delBtn.type = "button";
-        delBtn.onclick = () => {
-          if (confirm(`Tem certeza que deseja excluir o produto "${product.name}"?`)) {
-            deleteProduct(product.id);
+        li.onclick = () => {
+          if (selectedCategoryId !== category.id) {
+            selectedCategoryId = category.id;
+            renderCategories();
+            renderProducts();
+            btnAddProduct.disabled = false;
+            const cat = storeData.find((c) => c.id === selectedCategoryId);
+            selectedCategoryNameEl.textContent = `Produtos da categoria: ${cat.name}`;
           }
         };
 
-        tdActions.appendChild(editBtn);
-        tdActions.appendChild(delBtn);
+        li.onkeydown = (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            li.click();
+          }
+        };
 
-        tr.appendChild(tdImg);
-        tr.appendChild(tdName);
-        tr.appendChild(tdCat);
-        tr.appendChild(tdPrice);
-        tr.appendChild(tdStock);
-        tr.appendChild(tdActions);
-
-        productsList.appendChild(tr);
+        categoryListEl.appendChild(li);
       });
     }
 
-    // Add category
-    addCategoryForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const newCat = newCategoryNameInput.value.trim();
-      if (!newCat) return;
-      try {
-        await db.collection("categories").add({ name: newCat });
-        newCategoryNameInput.value = "";
-        await loadData();
-      } catch (error) {
-        alert("Erro ao adicionar categoria: " + error.message);
+    // Função para renderizar produtos da categoria selecionada
+    function renderProducts() {
+      productListEl.innerHTML = '';
+      if (!selectedCategoryId) {
+        productListEl.innerHTML = '';
+        return;
       }
-    });
+      const category = storeData.find((c) => c.id === selectedCategoryId);
+      if (!category || category.products.length === 0) {
+        const li = document.createElement('li');
+        li.className = 'p-4 text-center text-gray-500 italic';
+        li.textContent = 'Nenhum produto cadastrado nesta categoria.';
+        productListEl.appendChild(li);
+        return;
+      }
+      category.products.forEach((product) => {
+        const li = document.createElement('li');
+        li.className = 'flex flex-col sm:flex-row sm:items-center justify-between p-3 hover:bg-indigo-50 rounded-md transition-colors';
 
-    // Update category
-    async function updateCategory(oldName, newName) {
-      try {
-        // Find category doc
-        const snapshot = await db.collection("categories").where("name", "==", oldName).get();
-        if (!snapshot.empty) {
-          const docId = snapshot.docs[0].id;
-          await db.collection("categories").doc(docId).update({ name: newName });
-          // Update products with old category name
-          const prodSnapshot = await db.collection("products").where("category", "==", oldName).get();
-          const batch = db.batch();
-          prodSnapshot.forEach(doc => {
-            batch.update(doc.ref, { category: newName });
-          });
-          await batch.commit();
-          await loadData();
+        // Info do produto
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'flex items-center space-x-4 mb-3 sm:mb-0';
+
+        const img = document.createElement('img');
+        img.src = product.image;
+        img.alt = product.name + ' - imagem do produto';
+        img.className = 'w-20 h-20 object-cover rounded-md flex-shrink-0 border border-gray-300';
+
+        const textDiv = document.createElement('div');
+        textDiv.className = 'min-w-0';
+
+        const nameP = document.createElement('p');
+        nameP.className = 'font-semibold text-gray-800 truncate';
+        nameP.textContent = product.name;
+
+        const descP = document.createElement('p');
+        descP.className = 'text-gray-600 text-sm truncate';
+        descP.textContent = product.description;
+
+        textDiv.appendChild(nameP);
+        textDiv.appendChild(descP);
+
+        infoDiv.appendChild(img);
+        infoDiv.appendChild(textDiv);
+
+        // Preço e ações
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'flex items-center space-x-3';
+
+        const priceP = document.createElement('p');
+        priceP.className = 'font-semibold text-indigo-600 min-w-[90px] text-right';
+        priceP.textContent = product.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        const btnEdit = document.createElement('button');
+        btnEdit.className = 'text-indigo-600 hover:text-indigo-800 p-1 rounded-md';
+        btnEdit.title = 'Editar Produto';
+        btnEdit.setAttribute('aria-label', `Editar produto ${product.name}`);
+        btnEdit.innerHTML = '<i class="fas fa-edit"></i>';
+        btnEdit.onclick = () => openProductModal('edit', product.id);
+
+        const btnDelete = document.createElement('button');
+        btnDelete.className = 'text-red-600 hover:text-red-800 p-1 rounded-md';
+        btnDelete.title = 'Excluir Produto';
+        btnDelete.setAttribute('aria-label', `Excluir produto ${product.name}`);
+        btnDelete.innerHTML = '<i class="fas fa-trash-alt"></i>';
+        btnDelete.onclick = () => confirmDeleteProduct(product.id);
+
+        actionsDiv.appendChild(priceP);
+        actionsDiv.appendChild(btnEdit);
+        actionsDiv.appendChild(btnDelete);
+
+        li.appendChild(infoDiv);
+        li.appendChild(actionsDiv);
+
+        productListEl.appendChild(li);
+      });
+    }
+
+    // Função para abrir modal de categoria
+    function openCategoryModal(action, categoryId = null) {
+      modalMode = 'category';
+      modalAction = action;
+      editingCategoryId = categoryId;
+      modalForm.innerHTML = '';
+
+      if (action === 'add') {
+        modalTitle.textContent = 'Adicionar Categoria';
+      } else if (action === 'edit') {
+        modalTitle.textContent = 'Editar Categoria';
+      }
+
+      // Campo nome da categoria
+      const labelName = document.createElement('label');
+      labelName.className = 'block font-medium text-gray-700 mb-1';
+      labelName.setAttribute('for', 'categoryNameInput');
+      labelName.textContent = 'Nome da Categoria';
+
+      const inputName = document.createElement('input');
+      inputName.type = 'text';
+      inputName.id = 'categoryNameInput';
+      inputName.name = 'categoryName';
+      inputName.className = 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500';
+      inputName.required = true;
+      inputName.maxLength = 50;
+      inputName.autocomplete = 'off';
+
+      if (action === 'edit' && categoryId) {
+        const category = storeData.find((c) => c.id === categoryId);
+        if (category) {
+          inputName.value = category.name;
         }
-      } catch (error) {
-        alert("Erro ao atualizar categoria: " + error.message);
       }
+
+      modalForm.appendChild(labelName);
+      modalForm.appendChild(inputName);
+
+      showModal();
     }
 
-    // Delete category
-    async function deleteCategory(name) {
-      try {
-        // Delete category doc
-        const snapshot = await db.collection("categories").where("name", "==", name).get();
-        if (!snapshot.empty) {
-          const docId = snapshot.docs[0].id;
-          await db.collection("categories").doc(docId).delete();
-          // Remove category from products
-          const prodSnapshot = await db.collection("products").where("category", "==", name).get();
-          const batch = db.batch();
-          prodSnapshot.forEach(doc => {
-            batch.update(doc.ref, { category: "" });
-          });
-          await batch.commit();
-          await loadData();
+    // Função para abrir modal de produto
+    function openProductModal(action, productId = null) {
+      if (!selectedCategoryId) return;
+      modalMode = 'product';
+      modalAction = action;
+      editingProductId = productId;
+      modalForm.innerHTML = '';
+
+      if (action === 'add') {
+        modalTitle.textContent = 'Adicionar Produto';
+      } else if (action === 'edit') {
+        modalTitle.textContent = 'Editar Produto';
+      }
+
+      // Campos do produto: nome, descrição, imagem, preço
+
+      // Nome
+      const labelName = document.createElement('label');
+      labelName.className = 'block font-medium text-gray-700 mb-1';
+      labelName.setAttribute('for', 'productNameInput');
+      labelName.textContent = 'Nome do Produto';
+
+      const inputName = document.createElement('input');
+      inputName.type = 'text';
+      inputName.id = 'productNameInput';
+      inputName.name = 'productName';
+      inputName.className = 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500';
+      inputName.required = true;
+      inputName.maxLength = 100;
+      inputName.autocomplete = 'off';
+
+      // Descrição
+      const labelDesc = document.createElement('label');
+      labelDesc.className = 'block font-medium text-gray-700 mb-1 mt-4';
+      labelDesc.setAttribute('for', 'productDescInput');
+      labelDesc.textContent = 'Descrição';
+
+      const textareaDesc = document.createElement('textarea');
+      textareaDesc.id = 'productDescInput';
+      textareaDesc.name = 'productDesc';
+      textareaDesc.rows = 3;
+      textareaDesc.className = 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none';
+      textareaDesc.required = true;
+      textareaDesc.maxLength = 300;
+
+      // Imagem (URL)
+      const labelImage = document.createElement('label');
+      labelImage.className = 'block font-medium text-gray-700 mb-1 mt-4';
+      labelImage.setAttribute('for', 'productImageInput');
+      labelImage.textContent = 'URL da Imagem';
+
+      const inputImage = document.createElement('input');
+      inputImage.type = 'url';
+      inputImage.id = 'productImageInput';
+      inputImage.name = 'productImage';
+      inputImage.className = 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500';
+      inputImage.placeholder = 'https://exemplo.com/imagem.jpg';
+      inputImage.required = true;
+      inputImage.autocomplete = 'off';
+
+      // Preço
+      const labelPrice = document.createElement('label');
+      labelPrice.className = 'block font-medium text-gray-700 mb-1 mt-4';
+      labelPrice.setAttribute('for', 'productPriceInput');
+      labelPrice.textContent = 'Preço (R$)';
+
+      const inputPrice = document.createElement('input');
+      inputPrice.type = 'number';
+      inputPrice.id = 'productPriceInput';
+      inputPrice.name = 'productPrice';
+      inputPrice.className = 'w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500';
+      inputPrice.min = '0';
+      inputPrice.step = '0.01';
+      inputPrice.required = true;
+      inputPrice.placeholder = '0.00';
+
+      if (action === 'edit' && productId) {
+        const category = storeData.find((c) => c.id === selectedCategoryId);
+        if (category) {
+          const product = category.products.find((p) => p.id === productId);
+          if (product) {
+            inputName.value = product.name;
+            textareaDesc.value = product.description;
+            inputImage.value = product.image;
+            inputPrice.value = product.price.toFixed(2);
+          }
         }
-      } catch (error) {
-        alert("Erro ao excluir categoria: " + error.message);
+      }
+
+      modalForm.appendChild(labelName);
+      modalForm.appendChild(inputName);
+      modalForm.appendChild(labelDesc);
+      modalForm.appendChild(textareaDesc);
+      modalForm.appendChild(labelImage);
+      modalForm.appendChild(inputImage);
+      modalForm.appendChild(labelPrice);
+      modalForm.appendChild(inputPrice);
+
+      showModal();
+    }
+
+    // Função para mostrar modal
+    function showModal() {
+      modalContainer.classList.remove('hidden');
+      // Focar no primeiro input
+      const firstInput = modalForm.querySelector('input, textarea');
+      if (firstInput) firstInput.focus();
+    }
+
+    // Função para fechar modal
+    function closeModal() {
+      modalContainer.classList.add('hidden');
+      modalForm.reset();
+      editingCategoryId = null;
+      editingProductId = null;
+      modalMode = null;
+      modalAction = null;
+    }
+
+    // Função para confirmar exclusão de categoria
+    function confirmDeleteCategory(categoryId) {
+      const category = storeData.find((c) => c.id === categoryId);
+      if (!category) return;
+      if (confirm(`Tem certeza que deseja excluir a categoria "${category.name}" e todos os seus produtos?`)) {
+        storeData = storeData.filter((c) => c.id !== categoryId);
+        if (selectedCategoryId === categoryId) {
+          clearCategorySelection();
+        }
+        saveData();
+        renderCategories();
+        renderProducts();
       }
     }
 
-    // Add product
-    addProductForm.addEventListener("submit", async (e) => {
+    // Função para confirmar exclusão de produto
+    function confirmDeleteProduct(productId) {
+      if (!selectedCategoryId) return;
+      const category = storeData.find((c) => c.id === selectedCategoryId);
+      if (!category) return;
+      const product = category.products.find((p) => p.id === productId);
+      if (!product) return;
+      if (confirm(`Tem certeza que deseja excluir o produto "${product.name}"?`)) {
+        category.products = category.products.filter((p) => p.id !== productId);
+        saveData();
+        renderProducts();
+      }
+    }
+
+    // Função para validar URL de imagem (simples)
+    function isValidImageUrl(url) {
+      return /^https?:\/\/.+\.(jpg|jpeg|png|webp|avif|gif|svg)$/i.test(url.trim());
+    }
+
+    // Evento para abrir modal adicionar categoria
+    btnAddCategory.addEventListener('click', () => {
+      openCategoryModal('add');
+    });
+
+    // Evento para abrir modal adicionar produto
+    btnAddProduct.addEventListener('click', () => {
+      if (!selectedCategoryId) return;
+      openProductModal('add');
+    });
+
+    // Evento fechar modal
+    modalCloseBtn.addEventListener('click', closeModal);
+    modalCancelBtn.addEventListener('click', closeModal);
+
+    // Evento submit do formulário modal
+    modalForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const name = productNameInput.value.trim();
-      const image = productImageInput.value.trim();
-      const category = productCategorySelect.value;
-      const price = parseFloat(productPriceInput.value);
-      const stock = parseInt(productStockInput.value);
-      if (!name || !image || !category || isNaN(price) || isNaN(stock)) return;
-      try {
-        await db.collection("products").add({ name, image, category, price, stock });
-        productNameInput.value = "";
-        productImageInput.value = "";
-        productCategorySelect.value = "";
-        productPriceInput.value = "";
-        productStockInput.value = "";
-        await loadData();
-      } catch (error) {
-        alert("Erro ao adicionar produto: " + error.message);
+
+      if (modalMode === 'category') {
+        const nameInput = modalForm.querySelector('input[name="categoryName"]');
+        const name = nameInput.value.trim();
+
+        if (!name) {
+          alert('O nome da categoria é obrigatório.');
+          nameInput.focus();
+          return;
+        }
+
+        // Verifica duplicidade de nome (case insensitive)
+        const nameExists = storeData.some((c) => c.name.toLowerCase() === name.toLowerCase() && c.id !== editingCategoryId);
+        if (nameExists) {
+          alert('Já existe uma categoria com esse nome.');
+          nameInput.focus();
+          return;
+        }
+
+        if (modalAction === 'add') {
+          const newCategory = {
+            id: generateId('cat'),
+            name,
+            products: [],
+          };
+          storeData.push(newCategory);
+          selectedCategoryId = newCategory.id;
+        } else if (modalAction === 'edit' && editingCategoryId) {
+          const category = storeData.find((c) => c.id === editingCategoryId);
+          if (category) {
+            category.name = name;
+            // Atualiza nome da categoria selecionada se for a mesma
+            if (selectedCategoryId === editingCategoryId) {
+              selectedCategoryNameEl.textContent = `Produtos da categoria: ${name}`;
+            }
+          }
+        }
+
+        saveData();
+        renderCategories();
+        renderProducts();
+        closeModal();
+      } else if (modalMode === 'product') {
+        const nameInput = modalForm.querySelector('input[name="productName"]');
+        const descInput = modalForm.querySelector('textarea[name="productDesc"]');
+        const imageInput = modalForm.querySelector('input[name="productImage"]');
+        const priceInput = modalForm.querySelector('input[name="productPrice"]');
+
+        const name = nameInput.value.trim();
+        const description = descInput.value.trim();
+        const image = imageInput.value.trim();
+        const price = parseFloat(priceInput.value);
+
+        if (!name) {
+          alert('O nome do produto é obrigatório.');
+          nameInput.focus();
+          return;
+        }
+        if (!description) {
+          alert('A descrição do produto é obrigatória.');
+          descInput.focus();
+          return;
+        }
+        if (!image) {
+          alert('A URL da imagem é obrigatória.');
+          imageInput.focus();
+          return;
+        }
+        if (!isValidImageUrl(image)) {
+          alert('A URL da imagem deve ser válida e terminar com uma extensão de imagem (jpg, png, gif, etc).');
+          imageInput.focus();
+          return;
+        }
+        if (isNaN(price) || price < 0) {
+          alert('O preço deve ser um número válido maior ou igual a zero.');
+          priceInput.focus();
+          return;
+        }
+
+        const category = storeData.find((c) => c.id === selectedCategoryId);
+        if (!category) {
+          alert('Categoria não encontrada.');
+          closeModal();
+          return;
+        }
+
+        if (modalAction === 'add') {
+          const newProduct = {
+            id: generateId('prod'),
+            name,
+            description,
+            image,
+            price,
+          };
+          category.products.push(newProduct);
+        } else if (modalAction === 'edit' && editingProductId) {
+          const product = category.products.find((p) => p.id === editingProductId);
+          if (product) {
+            product.name = name;
+            product.description = description;
+            product.image = image;
+            product.price = price;
+          }
+        }
+
+        saveData();
+        renderProducts();
+        closeModal();
       }
     });
 
-    // Edit product dialog
-    function editProductDialog(product) {
-      const newName = prompt("Editar nome do produto:", product.name);
-      if (!newName || newName.trim() === "") return;
-      const newImage = prompt("Editar URL da imagem:", product.image);
-      if (!newImage || newImage.trim() === "") return;
-      const newCategory = prompt(`Editar categoria:\nCategorias disponíveis:\n${categories.join(", ")}`, product.category);
-      if (newCategory === null) return;
-      const newPrice = prompt("Editar preço (R$):", product.price);
-      if (newPrice === null || isNaN(parseFloat(newPrice))) return;
-      const newStock = prompt("Editar estoque:", product.stock);
-      if (newStock === null || isNaN(parseInt(newStock))) return;
-
-      updateProduct(product.id, newName.trim(), newImage.trim(), newCategory.trim(), parseFloat(newPrice), parseInt(newStock));
-    }
-
-    // Update product
-    async function updateProduct(id, name, image, category, price, stock) {
-      try {
-        await db.collection("products").doc(id).update({ name, image, category, price, stock });
-        await loadData();
-      } catch (error) {
-        alert("Erro ao atualizar produto: " + error.message);
-      }
-    }
-
-    // Delete product
-    async function deleteProduct(id) {
-      try {
-        await db.collection("products").doc(id).delete();
-        await loadData();
-      } catch (error) {
-        alert("Erro ao excluir produto: " + error.message);
-      }
-    }
-
-    // Login form submit
-    loginForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const pass = document.getElementById("admin-password").value;
-      if (pass === ADMIN_PASSWORD) {
-        sessionStorage.setItem("fideprota_admin_logged_in", "true");
-        loginError.classList.add("hidden");
-        checkLogin();
-      } else {
-        loginError.classList.remove("hidden");
-      }
+    // Inicialização da página
+    document.addEventListener('DOMContentLoaded', () => {
+      loadData();
+      renderCategories();
+      clearCategorySelection();
     });
-
-    // Logout button
-    logoutBtn.addEventListener("click", () => {
-      sessionStorage.removeItem("fideprota_admin_logged_in");
-      checkLogin();
-    });
-
-    // Initial check
-    checkLogin();
   </script>
 </body>
 </html>
